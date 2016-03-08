@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_item_routine"
+        android:icon="@drawable/ic_action_paste"
+        android:title="Routine" />
+
+    <item
+        android:id="@+id/nav_item_event"
+        android:icon="@drawable/ic_action_calendar_day"
+        android:title="Event" />
+
+    <item
+        android:id="@+id/nav_item_group"
+        android:icon="@drawable/ic_action_users"
+        android:title="Groups" />
+
+
+    <group android:id="@+id/group_settings_id">
+
+        <item
+            android:id="@+id/user_reset_password"
+            android:icon="@drawable/ic_action_key"
+            android:title="Reset Password" />
+
+        <item
+            android:id="@+id/user_delete"
+            android:icon="@drawable/ic_action_trash"
+            android:title="Delete" />
+        <item
+            android:id="@+id/user_logout"
+            android:icon="@drawable/ic_action_flag"
+            android:title="Logout" />
+    </group>
+</menu>

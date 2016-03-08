@@ -1,0 +1,112 @@
+<resources>
+    <string name="app_name">iSCHED</string>
+    <!-- Strings related to login and register -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_name">Username</string>
+    <string name="prompt_password">Password</string>
+    <string name="prompt_password_again">Password Again</string>
+    <string name="action_sign_in">Login</string>
+    <string name="action_sign_in_short">Register</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+    <string name="drawer_opened">Drawer Opened</string>
+    <string name="drawer_close">Drawer Closed</string>
+    <string name="action_logout">Logging Out . . .</string>
+    <string name="action_delete_user">Deleting Account . . </string>
+    <!-- Spinner Choices -->
+    <string-array name="choices">
+        <item>New Routine</item>
+        <item>New Event</item>
+        <item>New Group</item>
+    </string-array>
+
+    <!-- Menu -->
+    <string name="action_add">Add</string>
+    <string name="action_save">SAVE</string>
+    <string name="action_cancel">@android:string/cancel</string>
+
+    <!-- Task -->
+    <string name="prompt_title">Title</string>
+    <string name="prompt_content">Description</string>
+    <string name="prompt_date">Due Date</string>
+    <string name="prompt_priority">Priority</string>
+    <string name="prompt_day">Day</string>
+    <string name="prompt_time">Time Start</string>
+    <string name="dialogOk">@android:string/ok</string>
+    <string name="dialogCancel">@android:string/cancel</string>
+    <string name="selectDay">Select Day</string>
+    <string name="timeStart">Time Start</string>
+    <string name="noData">No Data Entered</string>
+    <string name="addRoutine">Adding Routine . . . </string>
+    <string name="deleteRoutine">Deleting Routine . . .</string>
+    <string name="saveTask">Creating New Task . . . </string>
+    <string name="updateTask">Updating Task . . </string>
+    <string name="updateRoutine">Updating Routine . . . </string>
+    <string name="viewRoutine">View Task</string>
+    <string name="newTask">New Task</string>
+    <string name="save_task">Save Task</string>
+    <string name="editTask">Edit Task</string>
+    <string name="deleteTask">Delete Task</string>
+    <string name="delete_task_message">Are you sure you want to delete this task?</string>
+    <string name="delete_task_ok">@android:string/yes</string>
+    <string name="delete_task_cancel">@android:string/cancel</string>
+    <string name="delete_task_loading">Deleting Task . . . </string>
+    <string name="edit_routine">Edit Routine</string>
+    <string name="delete_routine">Delete Routine</string>
+    <string name="rename_routine">Rename Routine</string>
+    <string-array name="day">
+        <item>Sunday</item>
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+    </string-array>
+
+    <!-- Event -->
+    <string name="action_today">TODAY</string>
+    <string name="event_title">Title</string>
+    <string name="event_location">Location</string>
+    <string name="event_description">Description</string>
+    <string name="btn_date_start">Date Start</string>
+    <string name="btn_date_end">Date End</string>
+    <string name="cb_allday">All Day</string>
+    <string name="btn_time_start">Time Start</string>
+    <string name="btn_time_end">Time End</string>
+    <string name="new_event">New Event</string>
+    <string name="all_day_start">11:59PM</string>
+    <string name="all_day_end">12:01AM</string>
+    <string name="share_event_group">Share to Group</string>
+    <string name="event_time_start">Time Start</string>
+    <string name="event_time_end">Time End</string>
+    <string name="event_date_start">Date Start</string>
+    <string name="event_date_end">Date End</string>
+    <string name="new_event_loading">Creating New Event . . .</string>
+    <string name="duplicate_event">Event Already Exist</string>
+    <string name="event_edit">Edit Event</string>
+    <string name="event_delete">Delete Event</string>
+    <string name="event_share">Share Event</string>
+    <string name="event_update_loading">Updating Event . . .</string>
+    <string name="event_delete_loading">Deleting Event . . .</string>
+    <string name="event_delete_message">Are you sure you want to delete this event?</string>
+    <string name="event_share_event">Share Event</string>
+    <string name="event_share_loading">Sharing Event . . .</string>
+    <!-- Group -->
+    <string name="new_group">New Group</string>
+    <string name="new_group_loading">Creating New Group . . .</string>
+    <string name="group_settings">Group Settings</string>
+    <string name="group_leave">Are you sure you want to leave?</string>
+    <string name="group_add_member">Add Member</string>
+    <string name="hint_search">Search</string>
+    <string name="group_add_member_loading">Adding Member . . .</string>
+    <string name="group_remove_member">Remove Member</string>
+    <string name="group_remove_member_loading">Removing Member . . .</string>
+    <string name="group_leave_loading">Leaving Group . . .</string>
+    <string name="share_your_event">My Events</string>
+</resources>

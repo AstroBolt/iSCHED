@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="mobcom.iacademy.thesis">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
+        android:name=".utilities.BackendConnection"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".login.Interceptor">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".login.LoginActivity"
+            android:label="Login" />
+        <activity android:name=".MainActivity" />
+        <activity
+            android:name=".login.RegisterActivity"
+            android:label="Register" />
+        <activity android:name=".routine.main.TaskInterfaceActivity" />
+        <activity android:name=".routine.main.NewTaskActivity" />
+        <activity android:name=".routine.main.EditTaskActivity" />
+        <activity android:name=".event.main.NewEventActivity" />
+        <activity android:name=".event.main.EditEventActivity" />
+        <activity android:name=".group.GroupInterfaceActivity" />
+        <activity android:name=".group.AddMemberActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable"
+                android:value=".group.AddMemberActivity" />
+        </activity>
+        <activity android:name=".event.main.ShareEventActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable"
+                android:value=".event.main.ShareEventActivity" />
+        </activity>
+        <activity android:name=".group.RemoveMemberActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable"
+                android:value=".group.RemoveMemberActivity" />
+        </activity>
+        <activity android:name=".group.ShareGroupEventActivity">
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable"
+                android:value=".group.RemoveMemberActivity" />
+        </activity>
+    </application>
+
+</manifest>
