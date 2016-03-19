@@ -22,6 +22,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
@@ -35,6 +36,7 @@ import com.parse.SaveCallback;
 import java.util.ArrayList;
 import java.util.List;
 
+import mobcom.iacademy.thesis.MainActivity;
 import mobcom.iacademy.thesis.R;
 import mobcom.iacademy.thesis.model.DayBean;
 import mobcom.iacademy.thesis.model.EventBean;
@@ -56,14 +58,17 @@ public class ShareEventActivity extends AppCompatActivity {
     private GroupMember[] groupMembers;
     DayBean day;
     Boolean flag = false;
+    private TextView emptyView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_share_event);
+        emptyView = (TextView) findViewById(R.id.empty);
         mainListView = (ListView) findViewById(R.id.mainListView);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        emptyView.setVisibility(View.GONE);
         intent = this.getIntent();
         if (intent != null) {
             event = new EventBean(intent.getStringExtra("eventId"),
@@ -74,7 +79,11 @@ public class ShareEventActivity extends AppCompatActivity {
                     intent.getStringExtra("eventLocation"),
                     intent.getStringExtra("eventDateStart"),
                     intent.getStringExtra("eventDateEnd"),
-                    intent.getStringExtra("eventOwner"));
+                    intent.getStringExtra("eventOwner"),
+                    intent.getBooleanExtra("isAllDay", false),
+                    intent.getIntExtra("dayYear", 0),
+                    intent.getIntExtra("dayMonth", 0),
+                    intent.getIntExtra("dayNow", 0));
 
             day = new DayBean(intent.getStringExtra("eventId"),
                     intent.getStringExtra("eventTitle"),
@@ -132,29 +141,22 @@ public class ShareEventActivity extends AppCompatActivity {
                                         groupEvent.put("groupEvent", event.getEvent());
                                         groupEvent.put("description", event.getDescription());
                                         groupEvent.put("location", event.getLocation());
-                                        groupEvent.put("year", day.getYear());
-                                        groupEvent.put("month", day.getMonth());
-                                        groupEvent.put("day", day.getDayNow());
+                                        groupEvent.put("year", event.getYear());
+                                        groupEvent.put("month", event.getMonth());
+                                        groupEvent.put("day", event.getDay());
                                         groupEvent.put("isCompleted", false);
                                         groupEvent.put("isSharable", false);
                                         groupEvent.put("timeStart", event.getTimeStart());
                                         groupEvent.put("timeEnd", event.getTimeEnd());
                                         groupEvent.put("dateStart", event.getDateStart());
                                         groupEvent.put("dateEnd", event.getDateEnd());
+                                        groupEvent.put("isAllDay", event.isAllDay());
                                         groupEvent.saveInBackground(new SaveCallback() {
                                             @Override
                                             public void done(ParseException e) {
                                                 progressDialog.cancel();
-                                                intent = new Intent(ShareEventActivity.this, EditEventActivity.class);
-                                                intent.putExtra("eventId", event.getId());
-                                                intent.putExtra("eventTitle", event.getEvent());
-                                                intent.putExtra("eventLocation", event.getLocation());
-                                                intent.putExtra("eventDateStart", event.getDateStart());
-                                                intent.putExtra("eventDateEnd", event.getDateEnd());
-                                                intent.putExtra("eventTimeStart", event.getTimeStart());
-                                                intent.putExtra("eventTimeEnd", event.getTimeEnd());
-                                                intent.putExtra("eventContent", event.getDescription());
-                                                intent.putExtra("eventOwner", event.getUsername());
+                                                intent = new Intent(ShareEventActivity.this, MainActivity.class);
+                                                intent.putExtra("Activity", "NewEvent");
                                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                                 startActivity(intent);
                                                 Toast.makeText(ShareEventActivity.this, "Event Successfully Shared", Toast.LENGTH_SHORT).show();
@@ -210,6 +212,12 @@ public class ShareEventActivity extends AppCompatActivity {
                     groupMembersList.add(member);
                 }
                 listAdapter.notifyDataSetChanged();
+
+                if(list.size() == 0){
+                    emptyView.setVisibility(View.VISIBLE);
+                }else{
+                    emptyView.setVisibility(View.GONE);
+                }
             }
         });
 
@@ -355,16 +363,9 @@ public class ShareEventActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
             case android.R.id.home:
-                intent = new Intent(ShareEventActivity.this, EditEventActivity.class);
-                intent.putExtra("eventId", event.getId());
-                intent.putExtra("eventTitle", event.getEvent());
-                intent.putExtra("eventLocation", event.getLocation());
-                intent.putExtra("eventDateStart", event.getDateStart());
-                intent.putExtra("eventDateEnd", event.getDateEnd());
-                intent.putExtra("eventTimeStart", event.getTimeStart());
-                intent.putExtra("eventTimeEnd", event.getTimeEnd());
-                intent.putExtra("eventContent", event.getDescription());
-                intent.putExtra("eventOwner", event.getUsername());
+                intent = new Intent(ShareEventActivity.this, MainActivity.class);
+                intent.putExtra("Activity", "NewEvent");
+                Toast.makeText(ShareEventActivity.this, "Event not shared.", Toast.LENGTH_SHORT).show();
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 break;

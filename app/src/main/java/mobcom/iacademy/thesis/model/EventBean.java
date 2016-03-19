@@ -13,6 +13,9 @@ public class EventBean {
     private String username;
     private boolean checked = false;
     private boolean isAllDay = false;
+    private int year;
+    private int day;
+    private int month;
 
     public EventBean(String userId, String userEvent, String userContent, String userTimeStart, String userTimeEnd, String userLocation, String userDayStart, String userDayEnd, String username) {
         this.id = userId;
@@ -26,7 +29,7 @@ public class EventBean {
         this.username = username;
     }
 
-    public EventBean(String userId, String userEvent, String userContent, String userTimeStart, String userTimeEnd, String userLocation, String userDayStart, String userDayEnd, String username, Boolean isAllDay) {
+    public EventBean(String userId, String userEvent, String userContent, String userTimeStart, String userTimeEnd, String userLocation, String userDayStart, String userDayEnd, String username, Boolean isAllDay, int year, int month, int day) {
         this.id = userId;
         this.event = userEvent;
         this.description = userContent;
@@ -37,6 +40,33 @@ public class EventBean {
         this.dateEnd = userDayEnd;
         this.username = username;
         this.isAllDay = isAllDay;
+        this.year = year;
+        this.month = month;
+        this.day = day;
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
+    }
+
+    public int getDay() {
+        return day;
+    }
+
+    public void setDay(int day) {
+        this.day = day;
+    }
+
+    public int getMonth() {
+        return month;
+    }
+
+    public void setMonth(int month) {
+        this.month = month;
     }
 
     public boolean isAllDay() {

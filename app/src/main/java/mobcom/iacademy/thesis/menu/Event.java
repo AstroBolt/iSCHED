@@ -1,7 +1,9 @@
 package mobcom.iacademy.thesis.menu;
 
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -51,6 +53,7 @@ import mobcom.iacademy.thesis.event.adapter.MySelectorDecorator;
 import mobcom.iacademy.thesis.event.adapter.OneDayDecorator;
 import mobcom.iacademy.thesis.event.main.EditEventActivity;
 import mobcom.iacademy.thesis.event.main.NewEventActivity;
+import mobcom.iacademy.thesis.event.main.ShareEventActivity;
 import mobcom.iacademy.thesis.model.DayBean;
 import mobcom.iacademy.thesis.model.EventBean;
 
@@ -144,26 +147,81 @@ public class Event extends Fragment implements OnDateSelectedListener, OnMonthCh
             @Override
             public void onItemClick(View view, int position) {
                 EventBean event = list.get(position);
-                Intent intent = new Intent(getActivity().getApplication(), EditEventActivity.class);
-                intent.putExtra("eventId", event.getId());
-                intent.putExtra("eventTitle", event.getEvent());
-                intent.putExtra("eventLocation", event.getLocation());
-                intent.putExtra("eventDateStart", event.getDateStart());
-                intent.putExtra("eventDateEnd", event.getDateEnd());
-                intent.putExtra("eventTimeStart", event.getTimeStart());
-                intent.putExtra("eventTimeEnd", event.getTimeEnd());
-                intent.putExtra("eventContent", event.getDescription());
-                intent.putExtra("eventOwner", event.getUsername());
-                intent.putExtra("dayYear", day.getYear());
-                intent.putExtra("dayMonth", day.getMonth());
-                intent.putExtra("dayNow", day.getDayNow());
-                intent.putExtra("isAllDay", event.isAllDay());
-                startActivity(intent);
-
+                viewEvent(event.getId(),
+                        event.getEvent(),
+                        event.getLocation(),
+                        event.getDateStart(),
+                        event.getDateEnd(),
+                        event.getTimeStart(),
+                        event.getTimeEnd(),
+                        event.getDescription(),
+                        event.getUsername(),
+                        event.getDay(),
+                        event.getMonth(),
+                        event.getYear(),
+                        event.isAllDay());
             }
         });
     }
 
+    private void viewEvent(final String eventId, final String eventTitle, final String eventLocation, final String dateStart, final String dateEnd, final String timeStart, final String timeEnd, final String description, final String owner, final int day, final int month, final int year, final boolean allDay){
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle(eventTitle);
+        alertDialog.setMessage("Description: " + description + "\n"
+        + "Date: " + dateStart + " - " + dateEnd + "\n"
+        + "Time: " + timeStart + " - " + timeEnd + "\n"
+        + "Location: " + eventLocation + "\n")
+        .setPositiveButton("Edit", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(owner.equals("holiday")){
+                    Toast.makeText(getActivity().getApplicationContext(), "You are not allowed to edit this event.", Toast.LENGTH_SHORT).show();
+                }else{
+                    Intent intent = new Intent(getActivity().getApplication(), EditEventActivity.class);
+                    intent.putExtra("eventId", eventId);
+                    intent.putExtra("eventTitle", eventTitle);
+                    intent.putExtra("eventLocation", eventLocation);
+                    intent.putExtra("eventDateStart", dateStart);
+                    intent.putExtra("eventDateEnd", dateEnd);
+                    intent.putExtra("eventTimeStart", timeStart);
+                    intent.putExtra("eventTimeEnd", timeEnd);
+                    intent.putExtra("eventContent", description);
+                    intent.putExtra("eventOwner", owner);
+                    intent.putExtra("dayYear", year);
+                    intent.putExtra("dayMonth", month);
+                    intent.putExtra("dayNow", day);
+                    intent.putExtra("isAllDay", allDay);
+                    startActivity(intent);
+                }
+            }
+        }).setNeutralButton("Share", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (owner.equals("holiday")) {
+                    Toast.makeText(getActivity().getApplicationContext(), "You are not allowed to share this event.", Toast.LENGTH_SHORT).show();
+                } else {
+                    intent = new Intent(getActivity().getApplication(), ShareEventActivity.class);
+                    intent.putExtra("eventId", eventId);
+                    intent.putExtra("eventTitle", eventTitle);
+                    intent.putExtra("eventLocation", eventLocation);
+                    intent.putExtra("eventDateStart", dateStart);
+                    intent.putExtra("eventDateEnd", dateEnd);
+                    intent.putExtra("eventTimeStart", timeStart);
+                    intent.putExtra("eventTimeEnd", timeEnd);
+                    intent.putExtra("eventContent", description);
+                    intent.putExtra("eventOwner", owner);
+                    intent.putExtra("dayYear", year);
+                    intent.putExtra("dayMonth", month);
+                    intent.putExtra("dayNow", day);
+                    intent.putExtra("isAllDay", allDay);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                }
+
+            }
+        }).setNegativeButton("Cancel", null).show();
+    }
 
     private void calendarConfig() {
         calendarView.setOnDateChangedListener(this);
@@ -244,7 +302,7 @@ public class Event extends Fragment implements OnDateSelectedListener, OnMonthCh
                 list.clear();
                 if (e == null) {
                     for (ParseObject userevent : objects) {
-                        EventBean eventsUser = new EventBean(userevent.getObjectId(), userevent.getString("event"), userevent.getString("description"), userevent.getString("timeStart"), userevent.getString("timeEnd"), userevent.getString("location"), userevent.getString("dateStart"), userevent.getString("dateEnd"), userevent.getString("username"), userevent.getBoolean("isAllDay"));
+                        EventBean eventsUser = new EventBean(userevent.getObjectId(), userevent.getString("event"), userevent.getString("description"), userevent.getString("timeStart"), userevent.getString("timeEnd"), userevent.getString("location"), userevent.getString("dateStart"), userevent.getString("dateEnd"), userevent.getString("username"), userevent.getBoolean("isAllDay"), userevent.getInt("year"), userevent.getInt("month"), userevent.getInt("day"));
                         list.add(eventsUser);
                     }
                     eventAdapter.notifyDataSetChanged();

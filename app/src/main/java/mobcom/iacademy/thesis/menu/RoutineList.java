@@ -11,15 +11,21 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ListFragment;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
@@ -32,6 +38,7 @@ import com.parse.SaveCallback;
 import java.util.ArrayList;
 import java.util.List;
 
+import mobcom.iacademy.thesis.MainActivity;
 import mobcom.iacademy.thesis.R;
 import mobcom.iacademy.thesis.model.RoutineBean;
 import mobcom.iacademy.thesis.routine.main.TaskInterfaceActivity;
@@ -44,20 +51,21 @@ public class RoutineList extends ListFragment {
     ArrayAdapter<RoutineBean> mAdapter;
     private ArrayList<RoutineBean> routine;
     private ProgressBar progressBar;
+    private TextView emptyView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setHasOptionsMenu(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_routine, container, false);
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
-
+        emptyView = (TextView) view.findViewById(R.id.empty);
+        emptyView.setVisibility(View.GONE);
         populateListView();
-
         FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,7 +75,45 @@ public class RoutineList extends ListFragment {
             }
         });
 
+        //getListView().setEmptyView(emptyView);
+
+
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.search, menu);
+        MenuItem item = menu.findItem(R.id.action_search);
+        SearchView sv = new SearchView(((MainActivity) getActivity()).getSupportActionBar().getThemedContext());
+        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        MenuItemCompat.setActionView(item, sv);
+        sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                onSearchTextSubmit(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                onSearchTextChanged(newText);
+                return false;
+            }
+        });
+
+    }
+
+    @TargetApi(11)
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+        RoutineBean routineBean = routine.get(position);
+        Intent intent = new Intent(getActivity().getApplication(), TaskInterfaceActivity.class);
+        intent.putExtra("groupId", routineBean.getId());
+        intent.putExtra("groupName", routineBean.getRoutineName());
+        intent.putExtra("groupAdmin", routineBean.getRoutineAdmin());
+        startActivity(intent);
     }
 
     private void populateListView() {
@@ -92,6 +138,12 @@ public class RoutineList extends ListFragment {
                             routine.add(routineBean);
                         }
                         ((ArrayAdapter<RoutineBean>) getListAdapter()).notifyDataSetChanged();
+
+                        if(list.size() == 0){
+                            emptyView.setVisibility(View.VISIBLE);
+                        }else{
+                            emptyView.setVisibility(View.GONE);
+                        }
                     } else {
                         Log.d(getClass().getSimpleName(), "Error: " + e.getMessage());
                     }
@@ -107,6 +159,97 @@ public class RoutineList extends ListFragment {
         }
     }
 
+    private void onSearchTextChanged(String userRoutine) {
+        progressBar.setVisibility(View.VISIBLE);
+        routine = new ArrayList<>();
+        mAdapter = new ArrayAdapter<>(getActivity(), R.layout.listview_row, routine);
+        setListAdapter(mAdapter);
+        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo ni = cm.getActiveNetworkInfo();
+        if ((ni != null) && (ni.isConnected())) {
+            ParseQuery<ParseObject> query = ParseQuery.getQuery("RoutineGroup");
+            query.whereStartsWith("routineGroup", userRoutine.toUpperCase());
+            query.whereEqualTo("username", ParseUser.getCurrentUser().getObjectId());
+            query.whereEqualTo("isDeleted", false);
+            query.findInBackground(new FindCallback<ParseObject>() {
+                @Override
+                public void done(List<ParseObject> list, ParseException e) {
+                    if (e == null) {
+                        progressBar.setVisibility(View.GONE);
+                        routine.clear();
+                        for (ParseObject post : list) {
+                            RoutineBean routineBean = new RoutineBean(post.getObjectId(), post.getString("routineGroup"), post.getString("username"));
+                            routine.add(routineBean);
+                        }
+                        ((ArrayAdapter<RoutineBean>) getListAdapter()).notifyDataSetChanged();
+
+                        if(list.size() == 0){
+                            emptyView.setVisibility(View.VISIBLE);
+                        }else{
+                            emptyView.setVisibility(View.GONE);
+                        }
+                    } else {
+                        Log.d(getClass().getSimpleName(), "Error: " + e.getMessage());
+                    }
+                }
+            });
+        }else{
+            progressBar.setVisibility(View.GONE);
+            // If there is no connection, let the user know the sync didn't happen
+            Toast.makeText(
+                    getActivity().getApplicationContext(),
+                    "Your device appears to be offline. Unable to fetch routines.",
+                    Toast.LENGTH_LONG).show();
+        }
+
+
+    }
+
+    private void onSearchTextSubmit(String userRoutine) {
+        progressBar.setVisibility(View.VISIBLE);
+        routine = new ArrayList<>();
+        mAdapter = new ArrayAdapter<>(getActivity(), R.layout.listview_row, routine);
+        setListAdapter(mAdapter);
+        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo ni = cm.getActiveNetworkInfo();
+        if ((ni != null) && (ni.isConnected())) {
+            ParseQuery<ParseObject> query = ParseQuery.getQuery("RoutineGroup");
+            query.whereEqualTo("routineGroup", userRoutine.toUpperCase());
+            query.whereEqualTo("username", ParseUser.getCurrentUser().getObjectId());
+            query.whereEqualTo("isDeleted", false);
+            query.findInBackground(new FindCallback<ParseObject>() {
+                @Override
+                public void done(List<ParseObject> list, ParseException e) {
+                    if (e == null) {
+                        progressBar.setVisibility(View.GONE);
+                        routine.clear();
+                        for (ParseObject post : list) {
+                            RoutineBean routineBean = new RoutineBean(post.getObjectId(), post.getString("routineGroup"), post.getString("username"));
+                            routine.add(routineBean);
+                        }
+                        ((ArrayAdapter<RoutineBean>) getListAdapter()).notifyDataSetChanged();
+
+                        if(list.size() == 0){
+                            emptyView.setVisibility(View.VISIBLE);
+                        }else{
+                            emptyView.setVisibility(View.GONE);
+                        }
+                    } else {
+                        Log.d(getClass().getSimpleName(), "Error: " + e.getMessage());
+                    }
+                }
+            });
+        }else{
+            progressBar.setVisibility(View.GONE);
+            // If there is no connection, let the user know the sync didn't happen
+            Toast.makeText(
+                    getActivity().getApplicationContext(),
+                    "Your device appears to be offline. Unable to fetch routines.",
+                    Toast.LENGTH_LONG).show();
+        }
+
+
+    }
 
     private void inputDialog() {
 
@@ -149,7 +292,7 @@ public class RoutineList extends ListFragment {
             progressDialog.setCancelable(false);
             progressDialog.show();
             final ParseObject routine = new ParseObject("RoutineGroup");
-            routine.put("routineGroup", routineName);
+            routine.put("routineGroup", routineName.toUpperCase());
             routine.put("username", ParseUser.getCurrentUser().getObjectId());
             routine.put("isDeleted", false);
             routine.saveInBackground(new SaveCallback() {
@@ -172,17 +315,5 @@ public class RoutineList extends ListFragment {
                     "Your device appears to be offline. Unable to submit.",
                     Toast.LENGTH_LONG).show();
         }
-    }
-
-    @TargetApi(11)
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-        RoutineBean routineBean = routine.get(position);
-        Intent intent = new Intent(getActivity().getApplication(), TaskInterfaceActivity.class);
-        intent.putExtra("groupId", routineBean.getId());
-        intent.putExtra("groupName", routineBean.getRoutineName());
-        intent.putExtra("groupAdmin", routineBean.getRoutineAdmin());
-        startActivity(intent);
     }
 }

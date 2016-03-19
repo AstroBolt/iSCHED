@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import mobcom.iacademy.thesis.R;
@@ -15,8 +16,8 @@ import mobcom.iacademy.thesis.model.TaskBean;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskHolder> {
 
-    List<TaskBean> taskBean;
-    private static OnItemClickListener mItemClickListener;
+    List<TaskBean> taskBean = new ArrayList<>();
+    public static OnItemClickListener mItemClickListener;
 
     public TaskAdapter(List<TaskBean> taskBean) {
         this.taskBean = taskBean;
@@ -70,7 +71,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskHolder> {
         @Override
         public void onClick(View v) {
             if (mItemClickListener != null) {
-                mItemClickListener.onItemClick(v, getAdapterPosition());
+                mItemClickListener.onItemClick(v, getAdapterPosition() );
             }
         }
 

@@ -66,8 +66,9 @@ public class MainActivity extends AppCompatActivity {
         lvNav = (ListView) findViewById(R.id.nav_list);
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
 
-        intent = this.getIntent();
-        setSupportActionBar(toolbar);
+
+
+
         //get user credentials
         username = (TextView) findViewById(R.id.profileUsername);
         email = (TextView) findViewById(R.id.profileEmail);
@@ -93,8 +94,34 @@ public class MainActivity extends AppCompatActivity {
         fragTran.addToBackStack(null);
         fragTran.commit();
         lvNav.setItemChecked(0, true);
-
         drawerLayout.closeDrawer(drawerPanel);
+
+        intent = this.getIntent();
+        if(intent.getExtras() != null){
+            String activity = intent.getStringExtra("Activity");
+            switch (activity){
+                case "NewEvent":
+                    setSupportActionBar(toolbar);
+                    getSupportActionBar().setTitle("Events");
+                    fragmentManager.beginTransaction().replace(R.id.containerView, listFragments.get(1)).commit();
+                    lvNav.setItemChecked(1, true);
+                    break;
+                case "New Routine":
+                    setSupportActionBar(toolbar);
+                    getSupportActionBar().setTitle("Routines");
+                    lvNav.setItemChecked(0, true);
+                    fragmentManager.beginTransaction().replace(R.id.containerView, listFragments.get(0)).commit();
+                    break;
+
+                case "New Group":
+                    setSupportActionBar(toolbar);
+                    getSupportActionBar().setTitle("Groups");
+                    lvNav.setItemChecked(2, true);
+                    fragmentManager.beginTransaction().replace(R.id.containerView, listFragments.get(2)).commit();
+                    break;
+
+            }
+        }
 
         //set listener for navigation items;
         lvNav.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -106,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (position == 0) {
                     fragmentManager.beginTransaction().replace(R.id.containerView, listFragments.get(0)).commit();
+                    setSupportActionBar(toolbar);
                     toolbar.setTitle(listNavItems.get(position).getTitle());
                     lvNav.setItemChecked(position, true);
                     drawerLayout.closeDrawer(drawerPanel);
@@ -113,12 +141,14 @@ public class MainActivity extends AppCompatActivity {
                 if (position == 1) {
 
                     fragmentManager.beginTransaction().replace(R.id.containerView, listFragments.get(1)).commit();
+                    setSupportActionBar(toolbar);
                     toolbar.setTitle(listNavItems.get(position).getTitle());
                     lvNav.setItemChecked(position, true);
                     drawerLayout.closeDrawer(drawerPanel);
                 }
                 if (position == 2) {
                     fragmentManager.beginTransaction().replace(R.id.containerView, listFragments.get(2)).commit();
+                    setSupportActionBar(toolbar);
                     toolbar.setTitle(listNavItems.get(position).getTitle());
                     lvNav.setItemChecked(position, true);
                     drawerLayout.closeDrawer(drawerPanel);
@@ -130,28 +160,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        if(intent.getExtras() != null){
-            String activity = intent.getStringExtra("Activity");
-            switch (activity){
-                case "New Event":
-                    toolbar.setTitle(listNavItems.get(1).getTitle());
-                    fragmentManager.beginTransaction().replace(R.id.containerView, listFragments.get(1)).commit();
-                    lvNav.setItemChecked(1, true);
-                    break;
-                case "New Routine":
-                    toolbar.setTitle(listNavItems.get(0).getTitle());
-                    lvNav.setItemChecked(0, true);
-                    fragmentManager.beginTransaction().replace(R.id.containerView, listFragments.get(0)).commit();
-                    break;
 
-                case "New Group":
-                    toolbar.setTitle(listNavItems.get(2).getTitle());
-                    lvNav.setItemChecked(2, true);
-                    fragmentManager.beginTransaction().replace(R.id.containerView, listFragments.get(2)).commit();
-                    break;
-
-            }
-        }
 
         //create listener for drawer layout
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_opened, R.string.drawer_close) {
@@ -181,6 +190,9 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         if(getSupportActionBar() != null){
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }else{
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+
         }
         actionBarDrawerToggle.syncState();
 

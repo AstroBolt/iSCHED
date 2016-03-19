@@ -25,6 +25,14 @@
         android:layout_centerVertical="true"
         android:progressDrawable="@drawable/circular_progress_view" />
 
+    <TextView
+        android:id="@+id/empty"
+        android:text="Looks like you don't have any groups."
+        android:textSize="18sp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center" />
+
     <ListView
         android:id="@+id/mainListView"
         android:layout_width="fill_parent"

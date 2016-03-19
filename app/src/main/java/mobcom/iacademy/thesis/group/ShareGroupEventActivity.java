@@ -21,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
@@ -46,6 +47,7 @@ import mobcom.iacademy.thesis.utilities.GroupHolder;
 
 public class ShareGroupEventActivity extends AppCompatActivity {
 
+    private TextView emptyView;
     Toolbar toolbar;
     ListView mainListView;
     ProgressDialog progressDialog;
@@ -62,6 +64,8 @@ public class ShareGroupEventActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_share_event2);
+        emptyView = (TextView) findViewById(R.id.empty);
+        emptyView.setVisibility(View.GONE);
         mainListView = (ListView) findViewById(R.id.mainListView);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         intent = this.getIntent();
@@ -190,6 +194,11 @@ public class ShareGroupEventActivity extends AppCompatActivity {
 
                     }
                     listAdapter.notifyDataSetChanged();
+                    if(list.size() == 0){
+                        emptyView.setVisibility(View.VISIBLE);
+                    }else{
+                        emptyView.setVisibility(View.GONE);
+                    }
                 }
             }
         });
@@ -273,11 +282,6 @@ public class ShareGroupEventActivity extends AppCompatActivity {
         alertDialogBuilder.setPositiveButton(R.string.dialogOk, null).show();
     }
 
-    private boolean isNetworkConnected() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        return cm.getActiveNetworkInfo() != null;
-    }
 
     public Object onRetainCustomNonConfigurationInstance() {
         return eventBeans;

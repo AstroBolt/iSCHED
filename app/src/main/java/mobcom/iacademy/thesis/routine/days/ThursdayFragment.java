@@ -1,6 +1,8 @@
 package mobcom.iacademy.thesis.routine.days;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -32,17 +35,19 @@ public class ThursdayFragment extends Fragment{
 
     Context context;
     TaskAdapter adapter;
-    private List<TaskBean> posts;
+    private List<TaskBean> posts = new ArrayList<>();
     private RoutineBean routine = new RoutineBean();
     private Intent intent;
     RecyclerView rv;
     private ProgressBar progressBar;
+    private TextView emptyView;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.thursday_layout, container, false);
-
+        emptyView = (TextView) root.findViewById(R.id.empty);
+        emptyView.setVisibility(View.GONE);
         progressBar = (ProgressBar) root.findViewById(R.id.progressBar);
         rv = (RecyclerView) root.findViewById(R.id.rv);
         rv.setHasFixedSize(true);
@@ -60,21 +65,34 @@ public class ThursdayFragment extends Fragment{
         adapter.SetOnItemClickListener(new TaskAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                TaskBean note = posts.get(position);
-                intent = new Intent(getActivity().getApplication(), EditTaskActivity.class);
-                intent.putExtra("selectedDay", "Sunday");
-                intent.putExtra("noteId", note.getId());
-                intent.putExtra("noteTitle", note.getTitle());
-                intent.putExtra("noteContent", note.getContent());
-                intent.putExtra("noteDate", note.getDueDate());
-                intent.putExtra("notePriority", note.getPriority());
-                intent.putExtra("noteUsername", note.getUsername());
-                intent.putExtra("noteGroupName", note.getRoutineGroup());
-                intent.putExtra("timeStart", note.getTimeStart());
-                intent.putExtra("groupId", routine.getId());
-                intent.putExtra("groupAdmin", routine.getRoutineAdmin());
-                intent.putExtra("groupName", routine.getRoutineName());
-                startActivity(intent);
+
+                try{
+                    TaskBean note = posts.get(position);
+                    viewTask(note.getId(),
+                            note.getTitle(),
+                            note.getPriority(),
+                            note.getDueDate(),
+                            note.getTimeStart(),
+                            note.getContent(),
+                            note.getUsername(),
+                            note.getRoutineGroup(),
+                            routine.getId(),
+                            routine.getRoutineAdmin(),
+                            routine.getRoutineName());
+                }catch (IndexOutOfBoundsException ibe){
+                    TaskBean note = posts.get(position);
+                    viewTask(note.getId(),
+                            note.getTitle(),
+                            note.getPriority(),
+                            note.getDueDate(),
+                            note.getTimeStart(),
+                            note.getContent(),
+                            note.getUsername(),
+                            note.getRoutineGroup(),
+                            routine.getId(),
+                            routine.getRoutineAdmin(),
+                            routine.getRoutineName());
+                }
             }
         });
 
@@ -103,10 +121,43 @@ public class ThursdayFragment extends Fragment{
                         posts.add(task);
                     }
                     adapter.notifyDataSetChanged();
+                    if(list.size() == 0){
+                        emptyView.setVisibility(View.VISIBLE);
+                    }else{
+                        emptyView.setVisibility(View.GONE);
+                    }
                 } else {
                     Log.d(getClass().getSimpleName(), "Error: " + e.getMessage());
                 }
             }
         });
+    }
+
+    private void viewTask(final String id, final String title, final String priority, final String dueDate, final String timeStart, final String content, final String owner, final String routineGroup, final String routineId, final String routineAdmin, final String routineName) {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle(title);
+        alertDialog.setMessage("Description: " + content + "\n" + "Day: Thursday" + "\n"
+                + "Priority: " + priority + "\n" + "Time Start: " + timeStart + "\n" +
+                "Due Date: " + dueDate);
+        alertDialog.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                intent = new Intent(getActivity().getApplication(), EditTaskActivity.class);
+                intent.putExtra("selectedDay", "Thursday");
+                intent.putExtra("noteId", id);
+                intent.putExtra("noteTitle", title);
+                intent.putExtra("noteContent", content);
+                intent.putExtra("noteDate", dueDate);
+                intent.putExtra("notePriority", priority);
+                intent.putExtra("noteUsername", owner);
+                intent.putExtra("noteGroupName", routineGroup);
+                intent.putExtra("timeStart", timeStart);
+                intent.putExtra("groupId", routineId);
+                intent.putExtra("groupAdmin", routineAdmin);
+                intent.putExtra("groupName", routineName);
+                startActivity(intent);
+            }
+        }).setNegativeButton("Cancel", null).show();
     }
 }

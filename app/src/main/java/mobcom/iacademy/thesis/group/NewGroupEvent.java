@@ -1,4 +1,4 @@
-package mobcom.iacademy.thesis.event.main;
+package mobcom.iacademy.thesis.group;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -38,8 +38,9 @@ import java.util.Calendar;
 import mobcom.iacademy.thesis.MainActivity;
 import mobcom.iacademy.thesis.R;
 import mobcom.iacademy.thesis.model.EventBean;
+import mobcom.iacademy.thesis.model.GroupBean;
 
-public class NewEventActivity extends AppCompatActivity implements
+public class NewGroupEvent extends AppCompatActivity implements
         com.wdullaer.materialdatetimepicker.date.DatePickerDialog.OnDateSetListener,
         com.wdullaer.materialdatetimepicker.time.TimePickerDialog.OnTimeSetListener {
 
@@ -49,18 +50,23 @@ public class NewEventActivity extends AppCompatActivity implements
     private CheckBox checkBox;
     private boolean allDay = false;
     private Intent intent;
-    private int dayNow, monthNow, yearNow, dayStart, dayEnd;
-    private String dateStart, dateEnd, format, timeStart, timeSet, timeEnd, title, location, content;
+    int dayNow, monthNow, yearNow, dayStart, dayEnd;
+    String dateStart, dateEnd, format, timeStart, timeSet, timeEnd, title, location, content;
     DecimalFormat df = new DecimalFormat("00");
     ArrayList<Integer> dayOfMonth = new ArrayList<>();
+    GroupBean groupBean;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_event);
+        setContentView(R.layout.activity_new_group_event);
+        intent = this.getIntent();
+        if (intent != null) {
+            groupBean = new GroupBean(intent.getStringExtra("groupId"), intent.getStringExtra("groupName"), intent.getStringExtra("groupAdmin"), intent.getStringExtra("id"));
+        }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
-        toolbar.setTitle(R.string.new_event);
+        toolbar.setTitle(R.string.new_group_event);
         setSupportActionBar(toolbar);
 
         initUI();
@@ -82,9 +88,12 @@ public class NewEventActivity extends AppCompatActivity implements
                 break;
 
             case R.id.action_cancel:
-                intent = new Intent(NewEventActivity.this, MainActivity.class);
-                intent.putExtra("Activity", "New Event");
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent = new Intent(NewGroupEvent.this, GroupInterfaceActivity.class);
+                intent.putExtra("groupId", groupBean.getId());
+                intent.putExtra("groupAdmin", groupBean.getGroupAdmin());
+                intent.putExtra("groupName", groupBean.getGroupName());
+                intent.putExtra("id", groupBean.getGroupId());
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 break;
 
@@ -165,7 +174,7 @@ public class NewEventActivity extends AppCompatActivity implements
 
     private void getDateStart() {
         Calendar now = Calendar.getInstance();
-        DatePickerDialog dpd = DatePickerDialog.newInstance(NewEventActivity.this, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
+        DatePickerDialog dpd = DatePickerDialog.newInstance(NewGroupEvent.this, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
         dpd.vibrate(true);
         dpd.setTitle(getString(R.string.event_date_start));
         dpd.setThemeDark(true);
@@ -186,7 +195,7 @@ public class NewEventActivity extends AppCompatActivity implements
 
     private void getDateEnd() {
         Calendar now = Calendar.getInstance();
-        DatePickerDialog dpd = DatePickerDialog.newInstance(NewEventActivity.this, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
+        DatePickerDialog dpd = DatePickerDialog.newInstance(NewGroupEvent.this, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
         dpd.vibrate(true);
         dpd.setTitle(getString(R.string.event_date_end));
         dpd.setThemeDark(true);
@@ -207,7 +216,7 @@ public class NewEventActivity extends AppCompatActivity implements
 
     private void getTimeStart() {
         Calendar now = Calendar.getInstance();
-        TimePickerDialog tpd = TimePickerDialog.newInstance(NewEventActivity.this, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), false);
+        TimePickerDialog tpd = TimePickerDialog.newInstance(NewGroupEvent.this, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), false);
         tpd.vibrate(true);
         tpd.enableSeconds(false);
         tpd.setTitle(getString(R.string.event_time_start));
@@ -242,7 +251,7 @@ public class NewEventActivity extends AppCompatActivity implements
 
     private void getTimeEnd() {
         Calendar now = Calendar.getInstance();
-        TimePickerDialog tpd = TimePickerDialog.newInstance(NewEventActivity.this, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), false);
+        TimePickerDialog tpd = TimePickerDialog.newInstance(NewGroupEvent.this, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), false);
         tpd.vibrate(true);
         tpd.enableSeconds(false);
         tpd.setTitle(getString(R.string.event_time_end));
@@ -331,14 +340,14 @@ public class NewEventActivity extends AppCompatActivity implements
     }
 
     private void saveEvent(final String title, final String content, final String location, final String timeStart, final String timeEnd, final String dateStart, final String dateEnd) {
-        final ProgressDialog progressDialog = new ProgressDialog(NewEventActivity.this);
+        final ProgressDialog progressDialog = new ProgressDialog(NewGroupEvent.this);
         progressDialog.setMessage(getString(R.string.new_event_loading));
         progressDialog.setCancelable(false);
         progressDialog.show();
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo ni = cm.getActiveNetworkInfo();
         if ((ni != null) && (ni.isConnected())) {
-            ParseQuery<ParseObject> query = ParseQuery.getQuery("Event");
+            ParseQuery<ParseObject> query = ParseQuery.getQuery("GroupEvent");
             query.whereEqualTo("username", ParseUser.getCurrentUser().getObjectId());
             query.whereEqualTo("location", location);
             query.whereEqualTo("dateStart", dateStart);
@@ -360,9 +369,12 @@ public class NewEventActivity extends AppCompatActivity implements
                     } else {
                         //if object does not exist
                         if (e.getCode() == ParseException.OBJECT_NOT_FOUND) {
-                            ParseObject event = new ParseObject("Event");
-                            event.put("username", ParseUser.getCurrentUser().getObjectId());
-                            event.put("event", title);
+                            ParseObject event = new ParseObject("GroupEvent");
+                            event.put("groupId", groupBean.getGroupId());
+                            event.put("groupName", groupBean.getGroupName());
+                            event.put("userId", ParseUser.getCurrentUser().getObjectId());
+                            event.put("username", ParseUser.getCurrentUser().getUsername());
+                            event.put("groupEvent", title);
                             event.put("description", content);
                             event.put("location", location);
                             event.put("year", yearNow);
@@ -388,11 +400,14 @@ public class NewEventActivity extends AppCompatActivity implements
                                 public void done(ParseException e) {
                                     if (e == null) {
                                         progressDialog.dismiss();
-                                        intent = new Intent(NewEventActivity.this, MainActivity.class);
-                                        intent.putExtra("Activity", "NewEvent");
+                                        intent = new Intent(NewGroupEvent.this, GroupInterfaceActivity.class);
+                                        intent.putExtra("groupId", groupBean.getId());
+                                        intent.putExtra("groupAdmin", groupBean.getGroupAdmin());
+                                        intent.putExtra("groupName", groupBean.getGroupName());
+                                        intent.putExtra("id", groupBean.getGroupId());
                                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                                         startActivity(intent);
-                                        Toast.makeText(NewEventActivity.this, "Event Successfully Created", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(NewGroupEvent.this, "Event Successfully Created", Toast.LENGTH_SHORT).show();
 
                                     }
                                 }
@@ -405,7 +420,7 @@ public class NewEventActivity extends AppCompatActivity implements
 
         } else {
             progressDialog.cancel();
-            Toast.makeText(NewEventActivity.this, "Your device appears to be offline. Unable to save event.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(NewGroupEvent.this, "Your device appears to be offline. Unable to save event.", Toast.LENGTH_SHORT).show();
         }
     }
 

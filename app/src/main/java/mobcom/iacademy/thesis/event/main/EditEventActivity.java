@@ -72,7 +72,8 @@ public class EditEventActivity extends AppCompatActivity implements
                     intent.getStringExtra("eventDateStart"),
                     intent.getStringExtra("eventDateEnd"),
                     intent.getStringExtra("eventOwner"),
-                    intent.getBooleanExtra("isAllDay", false));
+                    intent.getBooleanExtra("isAllDay", false),
+                    intent.getIntExtra("dayYear", 0), intent.getIntExtra("dayMonth", 0), intent.getIntExtra("dayNow", 0));
 
             day = new DayBean(intent.getStringExtra("eventId"), intent.getStringExtra("eventTitle"), intent.getIntExtra("dayYear", 0), intent.getIntExtra("dayMonth", 0), intent.getIntExtra("dayNow", 0));
         }
@@ -97,7 +98,8 @@ public class EditEventActivity extends AppCompatActivity implements
 
         if (id == android.R.id.home) {
             intent = new Intent(EditEventActivity.this, MainActivity.class);
-            intent.putExtra("Activity", "New Event");
+            intent.putExtra("Activity", "NewEvent");
+            Toast.makeText(EditEventActivity.this, "Event not Saved.", Toast.LENGTH_SHORT).show();
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         }
@@ -115,23 +117,6 @@ public class EditEventActivity extends AppCompatActivity implements
                 }
             }).setNegativeButton(R.string.delete_task_cancel, null).show();
 
-        }
-        if (id == R.id.action_share) {
-            intent = new Intent(EditEventActivity.this, ShareEventActivity.class);
-            intent.putExtra("eventId", event.getId());
-            intent.putExtra("eventTitle", event.getEvent());
-            intent.putExtra("eventLocation", event.getLocation());
-            intent.putExtra("eventDateStart", event.getDateStart());
-            intent.putExtra("eventDateEnd", event.getDateEnd());
-            intent.putExtra("eventTimeStart", event.getTimeStart());
-            intent.putExtra("eventTimeEnd", event.getTimeEnd());
-            intent.putExtra("eventContent", event.getDescription());
-            intent.putExtra("eventOwner", event.getUsername());
-            intent.putExtra("dayYear", day.getYear());
-            intent.putExtra("dayMonth", day.getMonth());
-            intent.putExtra("dayNow", day.getDayNow());
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
@@ -227,6 +212,9 @@ public class EditEventActivity extends AppCompatActivity implements
                 yearNow = year;
                 dateStart = (getMonth(monthNow) + " " + dayNow + ", " + yearNow);
                 dateStartView.setText(dateStart);
+                event.setDay(dayOfMonth);
+                event.setMonth(monthOfYear);
+                event.setYear(year);
                 //insert next function here
                 getDateEnd();
             }
@@ -316,6 +304,7 @@ public class EditEventActivity extends AppCompatActivity implements
                 timeSet = String.valueOf(df.format(hour) + ":" + String.valueOf(df.format(minute)));
                 timeEnd = timeSet + " " + format;
                 timeEndView.setText(timeEnd);
+
                 //insert next function here
 
             }
@@ -393,9 +382,9 @@ public class EditEventActivity extends AppCompatActivity implements
                     parseObject.put("event", title);
                     parseObject.put("description", content);
                     parseObject.put("location", location);
-                    parseObject.put("year", yearNow);
-                    parseObject.put("month", monthNow);
-                    parseObject.put("day", dayNow);
+                    parseObject.put("year", event.getYear());
+                    parseObject.put("month", event.getMonth());
+                    parseObject.put("day", event.getDay());
                     parseObject.put("isCompleted", false);
                     parseObject.put("isSharable", false);
                     if (allDay == false) {
@@ -417,7 +406,7 @@ public class EditEventActivity extends AppCompatActivity implements
                         public void done(ParseException e) {
                             progressDialog.cancel();
                             intent = new Intent(EditEventActivity.this, MainActivity.class);
-                            intent.putExtra("Activity", "New Event");
+                            intent.putExtra("Activity", "NewEvent");
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(intent);
                             Toast.makeText(EditEventActivity.this, "Event Successfully Updated", Toast.LENGTH_SHORT).show();

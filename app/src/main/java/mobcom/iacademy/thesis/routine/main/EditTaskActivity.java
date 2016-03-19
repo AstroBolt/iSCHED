@@ -94,6 +94,7 @@ public class EditTaskActivity extends AppCompatActivity implements
                 intent.putExtra("groupName", routineBean.getRoutineName());
                 intent.putExtra("groupAdmin", routineBean.getRoutineAdmin());
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                Toast.makeText(EditTaskActivity.this, "No information entered. Task not saved", Toast.LENGTH_SHORT).show();
                 startActivity(intent);
                 break;
 

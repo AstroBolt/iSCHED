@@ -36,6 +36,7 @@ import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
 
+import java.security.acl.Group;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -51,6 +52,8 @@ import mobcom.iacademy.thesis.event.adapter.HighlightWeekendsDecorator;
 import mobcom.iacademy.thesis.event.adapter.MySelectorDecorator;
 import mobcom.iacademy.thesis.event.adapter.OneDayDecorator;
 import mobcom.iacademy.thesis.event.main.EditEventActivity;
+import mobcom.iacademy.thesis.event.main.NewEventActivity;
+import mobcom.iacademy.thesis.event.main.ShareEventActivity;
 import mobcom.iacademy.thesis.model.DayBean;
 import mobcom.iacademy.thesis.model.EventBean;
 import mobcom.iacademy.thesis.model.GroupBean;
@@ -100,11 +103,12 @@ public class GroupInterfaceActivity extends AppCompatActivity implements OnDateS
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*Intent intent = new Intent(GroupInterfaceActivity.this, NewTaskActivity.class);
-                intent.putExtra("groupId", routineBean.getId());
-                intent.putExtra("groupName", routineBean.getRoutineName());
-                intent.putExtra("groupAdmin", routineBean.getRoutineAdmin());
-                startActivity(intent);*/
+                Intent intent = new Intent(GroupInterfaceActivity.this, NewGroupEvent.class);
+                intent.putExtra("groupId", groupBean.getId());
+                intent.putExtra("groupAdmin", groupBean.getGroupAdmin());
+                intent.putExtra("groupName", groupBean.getGroupName());
+                intent.putExtra("id", groupBean.getGroupId());
+                startActivity(intent);
             }
         });
     }
@@ -174,11 +178,46 @@ public class GroupInterfaceActivity extends AppCompatActivity implements OnDateS
                 intent.putExtra("eventContent", event.getDescription());
                 intent.putExtra("eventOwner", event.getUsername());
                 //startActivity(intent);
+                viewEvent(event.getId(),
+                        event.getEvent(),
+                        event.getLocation(),
+                        event.getDateStart(),
+                        event.getDateEnd(),
+                        event.getTimeStart(),
+                        event.getTimeEnd(),
+                        event.getDescription(),
+                        event.getUsername(),
+                        event.getDay(),
+                        event.getMonth(),
+                        event.getYear(),
+                        event.isAllDay());
+
 
             }
         });
     }
 
+    private void viewEvent(final String eventId, final String eventTitle, final String eventLocation, final String dateStart, final String dateEnd, final String timeStart, final String timeEnd, final String description, final String owner, final int day, final int month, final int year, final boolean allDay) {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle(eventTitle);
+        alertDialog.setMessage("Description: " + description + "\n"
+                + "Date: " + dateStart + " - " + dateEnd + "\n"
+                + "Time: " + timeStart + " - " + timeEnd + "\n"
+                + "Location: " + eventLocation + "\n"
+                + "Owner: " + owner);
+
+        alertDialog.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(GroupInterfaceActivity.this, "Edit", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        alertDialog.setNegativeButton("Cancel", null);
+
+        alertDialog.show();
+    }
 
     private void calendarConfig() {
         calendarView.setOnDateChangedListener(this);
@@ -276,7 +315,7 @@ public class GroupInterfaceActivity extends AppCompatActivity implements OnDateS
                 list.clear();
                 if (e == null) {
                     for (ParseObject userevent : objects) {
-                        EventBean eventsUser = new EventBean(userevent.getObjectId(), userevent.getString("groupEvent"), userevent.getString("description"), userevent.getString("timeStart"), userevent.getString("timeEnd"), userevent.getString("location"), userevent.getString("dateStart"), userevent.getString("dateEnd"), userevent.getString("userId"));
+                        EventBean eventsUser = new EventBean(userevent.getObjectId(), userevent.getString("groupEvent"), userevent.getString("description"), userevent.getString("timeStart"), userevent.getString("timeEnd"), userevent.getString("location"), userevent.getString("dateStart"), userevent.getString("dateEnd"), userevent.getString("username"));
                         list.add(eventsUser);
                     }
                     eventAdapter.notifyDataSetChanged();
@@ -290,7 +329,7 @@ public class GroupInterfaceActivity extends AppCompatActivity implements OnDateS
     private void userProfile() {
         AlertDialog.Builder builder = new AlertDialog.Builder(GroupInterfaceActivity.this);
         builder.setTitle("Group Settings");
-        String[] types = {"Share Events", "Add Member", "View Member", "Leave Group"};
+        String[] types = {"Share Your Events", "View Members", "Leave Group"};
         builder.setItems(types, new DialogInterface.OnClickListener() {
 
             @Override
@@ -306,14 +345,6 @@ public class GroupInterfaceActivity extends AppCompatActivity implements OnDateS
                         startActivity(intent);
                         break;
                     case 1:
-                        intent = new Intent(GroupInterfaceActivity.this, AddMemberActivity.class);
-                        intent.putExtra("groupId", groupBean.getId());
-                        intent.putExtra("groupAdmin", groupBean.getGroupAdmin());
-                        intent.putExtra("groupName", groupBean.getGroupName());
-                        intent.putExtra("id", groupBean.getGroupId());
-                        startActivity(intent);
-                        break;
-                    case 2:
                         intent = new Intent(GroupInterfaceActivity.this, RemoveMemberActivity.class);
                         intent.putExtra("groupId", groupBean.getId());
                         intent.putExtra("groupAdmin", groupBean.getGroupAdmin());
@@ -321,7 +352,7 @@ public class GroupInterfaceActivity extends AppCompatActivity implements OnDateS
                         intent.putExtra("id", groupBean.getGroupId());
                         startActivity(intent);
                         break;
-                    case 3:
+                    case 2:
                         leaveGroup();
                         break;
                 }

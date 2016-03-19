@@ -34,6 +34,14 @@
 
     </ListView>
 
+    <TextView
+        android:id="@+id/empty"
+        android:text="Looks like you don't have any events."
+        android:textSize="18sp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center" />
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
@@ -42,8 +50,5 @@
         android:layout_alignParentRight="true"
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/ic_action_add" />
-
-
-
 
 </RelativeLayout>

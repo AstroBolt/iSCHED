@@ -38,9 +38,11 @@ public class TaskInterfaceActivity extends AppCompatActivity {
 
     private RoutineBean routineBean;
     Intent intent;
-    TabLayout tabLayout;
     Toolbar toolbar;
     ProgressDialog progressDialog;
+    ViewPager viewPager;
+    PagerAdapter adapter;
+    TabLayout tabLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +64,7 @@ public class TaskInterfaceActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText("SUN"));
         tabLayout.addTab(tabLayout.newTab().setText("MON"));
         tabLayout.addTab(tabLayout.newTab().setText("TUE"));
@@ -72,8 +74,8 @@ public class TaskInterfaceActivity extends AppCompatActivity {
         tabLayout.addTab(tabLayout.newTab().setText("SAT"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
-        final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        final PagerAdapter adapter = new PagerAdapter
+        viewPager = (ViewPager) findViewById(R.id.pager);
+        adapter = new PagerAdapter
                 (getSupportFragmentManager(), tabLayout.getTabCount());
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));

@@ -13,6 +13,13 @@
         android:layout_centerVertical="true"
         android:progressDrawable="@drawable/circular_progress_view" />
 
+    <TextView
+        android:id="@+id/empty"
+        android:text="Looks like you don't have any task.\n Tap the plus icon to create a task."
+        android:textSize="18sp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv"

@@ -5,6 +5,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.MenuItemCompat;
@@ -76,32 +77,35 @@ public class RemoveMemberActivity extends AppCompatActivity {
                 for (int i = 0; i < groupMembersList.size(); i++) {
                     final GroupMember groupMembers = groupMembersList.get(i);
                     if (groupMembers.isChecked()) {
-                        ParseQuery<ParseObject> removeMembers = ParseQuery.getQuery("GroupMembers");
-                        removeMembers.getInBackground(groupMembers.getId(), new GetCallback<ParseObject>() {
-                            @Override
-                            public void done(ParseObject parseObject, ParseException e) {
-                                parseObject.put("username", groupMembers.getGroupName());
-                                parseObject.put("isDeleted", true);
-                                parseObject.pinInBackground();
-                                parseObject.saveInBackground(new SaveCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        if (e == null) {
-                                            progressDialog.dismiss();
-                                            intent = new Intent(RemoveMemberActivity.this, GroupInterfaceActivity.class);
-                                            intent.putExtra("groupId", groupBean.getId());
-                                            intent.putExtra("groupAdmin", groupBean.getGroupAdmin());
-                                            intent.putExtra("groupName", groupBean.getGroupName());
-                                            intent.putExtra("id", groupBean.getGroupId());
-                                            Toast.makeText(RemoveMemberActivity.this, "Delete Success", Toast.LENGTH_SHORT).show();
-                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                            startActivity(intent);
+                        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                        NetworkInfo ni = cm.getActiveNetworkInfo();
+                        if ((ni != null) && (ni.isConnected())) {
+                            ParseQuery<ParseObject> removeMembers = ParseQuery.getQuery("GroupMembers");
+                            removeMembers.getInBackground(groupMembers.getId(), new GetCallback<ParseObject>() {
+                                @Override
+                                public void done(ParseObject parseObject, ParseException e) {
+                                    parseObject.put("username", groupMembers.getGroupName());
+                                    parseObject.put("isDeleted", true);
+                                    parseObject.pinInBackground();
+                                    parseObject.saveInBackground(new SaveCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            if (e == null) {
+                                                progressDialog.dismiss();
+                                                populateListView();
+                                            }
                                         }
-                                    }
-                                });
+                                    });
 
-                            }
-                        });
+                                }
+                            });
+                        }else{
+                            progressDialog.dismiss();
+                            Toast.makeText(
+                                    RemoveMemberActivity.this,
+                                    "Your device appears to be offline. Unable to delete member/s.",
+                                    Toast.LENGTH_LONG).show();
+                        }
                     }
                 }
             }
@@ -200,7 +204,18 @@ public class RemoveMemberActivity extends AppCompatActivity {
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 break;
+
+            case R.id.addMember:
+                intent = new Intent(RemoveMemberActivity.this, AddMemberActivity.class);
+                intent.putExtra("groupId", groupBean.getId());
+                intent.putExtra("groupAdmin", groupBean.getGroupAdmin());
+                intent.putExtra("groupName", groupBean.getGroupName());
+                intent.putExtra("id", groupBean.getGroupId());
+                startActivity(intent);
+                break;
         }
+
+
         return super.onOptionsItemSelected(item);
     }
 

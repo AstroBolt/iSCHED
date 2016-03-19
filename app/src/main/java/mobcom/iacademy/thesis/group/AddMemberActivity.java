@@ -91,7 +91,7 @@ public class AddMemberActivity extends AppCompatActivity {
                                 public void done(ParseException e) {
                                     Toast.makeText(AddMemberActivity.this, "Successfully Added New Members", Toast.LENGTH_LONG).show();
                                     progressDialog.dismiss();
-                                    intent = new Intent(AddMemberActivity.this, GroupInterfaceActivity.class);
+                                    intent = new Intent(AddMemberActivity.this, RemoveMemberActivity.class);
                                     intent.putExtra("intent", "groupname");
                                     intent.putExtra("groupId", groupBean.getId());
                                     intent.putExtra("groupAdmin", groupBean.getGroupAdmin());
@@ -104,7 +104,10 @@ public class AddMemberActivity extends AppCompatActivity {
                         }
                     }
                 }else{
-                    //if internet is false
+                    Toast.makeText(
+                            AddMemberActivity.this,
+                            "Your device appears to be offline. Unable to add member/s.",
+                            Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -153,7 +156,7 @@ public class AddMemberActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
             case android.R.id.home:
-                intent = new Intent(AddMemberActivity.this, GroupInterfaceActivity.class);
+                intent = new Intent(AddMemberActivity.this, RemoveMemberActivity.class);
                 intent.putExtra("groupId", groupBean.getId());
                 intent.putExtra("groupAdmin", groupBean.getGroupAdmin());
                 intent.putExtra("groupName", groupBean.getGroupName());

@@ -28,6 +28,14 @@
 
     </ListView>
 
+    <TextView
+        android:id="@+id/empty"
+        android:text="Looks like you don't have any groups.\n Tap the plus icon to create groups."
+        android:textSize="18sp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center" />
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"

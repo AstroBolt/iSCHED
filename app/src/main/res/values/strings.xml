@@ -105,8 +105,10 @@
     <string name="group_add_member">Add Member</string>
     <string name="hint_search">Search</string>
     <string name="group_add_member_loading">Adding Member . . .</string>
-    <string name="group_remove_member">Remove Member</string>
+    <string name="group_remove_member">View Members</string>
     <string name="group_remove_member_loading">Removing Member . . .</string>
     <string name="group_leave_loading">Leaving Group . . .</string>
     <string name="share_your_event">My Events</string>
+    <string name="new_group_event">New Group Event</string>
+    <string name="no_group_query">No results were returned for that query.</string>
 </resources>
