@@ -22,15 +22,15 @@
         <activity
             android:name=".login.LoginActivity"
             android:label="Login" />
-        <activity android:name=".MainActivity" />
+        <activity android:name=".controller.MainActivity" />
         <activity
             android:name=".login.RegisterActivity"
             android:label="Register" />
-        <activity android:name=".routine.main.TaskInterfaceActivity" />
-        <activity android:name=".routine.main.NewTaskActivity" />
-        <activity android:name=".routine.main.EditTaskActivity" />
-        <activity android:name=".event.main.NewEventActivity" />
-        <activity android:name=".event.main.EditEventActivity" />
+        <activity android:name=".routine.controller.TaskInterfaceActivity" />
+        <activity android:name=".routine.controller.NewTaskActivity" />
+        <activity android:name=".routine.controller.EditTaskActivity" />
+        <activity android:name=".event.controller.NewEventActivity" />
+        <activity android:name=".event.controller.EditEventActivity" />
         <activity android:name=".group.GroupInterfaceActivity" />
         <activity android:name=".group.AddMemberActivity">
             <intent-filter>
@@ -42,7 +42,7 @@
                 android:resource="@xml/searchable"
                 android:value=".group.AddMemberActivity" />
         </activity>
-        <activity android:name=".event.main.ShareEventActivity">
+        <activity android:name=".event.controller.ShareEventActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>

@@ -20,7 +20,7 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
-import mobcom.iacademy.thesis.MainActivity;
+import mobcom.iacademy.thesis.controller.MainActivity;
 import mobcom.iacademy.thesis.R;
 
 

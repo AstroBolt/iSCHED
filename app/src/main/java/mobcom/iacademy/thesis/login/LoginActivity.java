@@ -21,7 +21,7 @@ import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
-import mobcom.iacademy.thesis.MainActivity;
+import mobcom.iacademy.thesis.controller.MainActivity;
 import mobcom.iacademy.thesis.R;
 
 

@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.parse.ParseUser;
 
-import mobcom.iacademy.thesis.MainActivity;
+import mobcom.iacademy.thesis.controller.MainActivity;
 import mobcom.iacademy.thesis.R;
 
 

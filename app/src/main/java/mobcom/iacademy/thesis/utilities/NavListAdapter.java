@@ -10,7 +10,6 @@ import android.widget.TextView;
 import java.util.List;
 
 import mobcom.iacademy.thesis.R;
-import mobcom.iacademy.thesis.model.NavItem;
 
 
 public class NavListAdapter extends ArrayAdapter<NavItem> {

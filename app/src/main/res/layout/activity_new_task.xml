@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="mobcom.iacademy.thesis.routine.main.NewTaskActivity">
+    tools:context="mobcom.iacademy.thesis.routine.controller.NewTaskActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/tool_bar"

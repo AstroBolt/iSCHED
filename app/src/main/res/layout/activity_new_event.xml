@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="mobcom.iacademy.thesis.event.main.NewEventActivity">
+    tools:context="mobcom.iacademy.thesis.event.controller.NewEventActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/tool_bar"
