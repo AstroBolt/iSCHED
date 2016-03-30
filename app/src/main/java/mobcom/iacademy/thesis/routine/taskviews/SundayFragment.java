@@ -35,7 +35,7 @@ import mobcom.iacademy.thesis.routine.controller.EditTaskActivity;
 public class SundayFragment extends Fragment {
 
     Context context;
-    private List<TaskBean> posts = new ArrayList<>();
+    private List<TaskBean> posts;
     private RoutineBean routine = new RoutineBean();
     private Intent intent;
     RecyclerView rv;
@@ -102,6 +102,7 @@ public class SundayFragment extends Fragment {
 
     private void getSundayTasks() {
         //Sunday
+        posts = new ArrayList<>();
         progressBar.setVisibility(View.VISIBLE);
         adapter = new TaskAdapter(posts);
         rv.setAdapter(adapter);

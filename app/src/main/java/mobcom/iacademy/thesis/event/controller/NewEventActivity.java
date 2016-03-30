@@ -83,7 +83,7 @@ public class NewEventActivity extends AppCompatActivity implements
 
             case R.id.action_cancel:
                 intent = new Intent(NewEventActivity.this, MainActivity.class);
-                intent.putExtra("Activity", "New Event");
+                intent.putExtra("Activity", "NewEvent");
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 break;

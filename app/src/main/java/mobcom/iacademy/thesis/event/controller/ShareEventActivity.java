@@ -26,7 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
-import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -36,8 +35,8 @@ import com.parse.SaveCallback;
 import java.util.ArrayList;
 import java.util.List;
 
-import mobcom.iacademy.thesis.controller.MainActivity;
 import mobcom.iacademy.thesis.R;
+import mobcom.iacademy.thesis.controller.MainActivity;
 import mobcom.iacademy.thesis.event.model.DayBean;
 import mobcom.iacademy.thesis.event.model.EventBean;
 import mobcom.iacademy.thesis.group.model.GroupBean;
@@ -110,59 +109,35 @@ public class ShareEventActivity extends AppCompatActivity {
                         member = groupMembersList.get(x);
                         if (member.isChecked()) {
                             //AddNewGroupEvent
-                            ParseQuery<ParseObject> query = ParseQuery.getQuery("GroupEvent");
-                            query.whereEqualTo("groupId", member.getGroupId());
-                            query.whereEqualTo("dateStart", event.getDateStart());
-                            query.whereEqualTo("dateEnd", event.getDateEnd());
-                            query.whereEqualTo("timeStart", event.getTimeStart());
-                            query.whereEqualTo("timeEnd", event.getTimeEnd());
-                            query.whereEqualTo("isCompleted", false);
-                            query.getFirstInBackground(new GetCallback<ParseObject>() {
+                            progressDialog.cancel();
+                            ParseObject groupEvent = new ParseObject("GroupEvent");
+                            groupEvent.put("eventId", event.getId());
+                            groupEvent.put("groupId", member.getGroupId());
+                            groupEvent.put("groupName", member.getGroupName());
+                            groupEvent.put("userId", ParseUser.getCurrentUser().getObjectId());
+                            groupEvent.put("username", ParseUser.getCurrentUser().getUsername());
+                            groupEvent.put("groupEvent", event.getEvent());
+                            groupEvent.put("description", event.getDescription());
+                            groupEvent.put("location", event.getLocation());
+                            groupEvent.put("year", event.getYear());
+                            groupEvent.put("month", event.getMonth());
+                            groupEvent.put("day", event.getDay());
+                            groupEvent.put("isCompleted", false);
+                            groupEvent.put("isSharable", false);
+                            groupEvent.put("timeStart", event.getTimeStart());
+                            groupEvent.put("timeEnd", event.getTimeEnd());
+                            groupEvent.put("dateStart", event.getDateStart());
+                            groupEvent.put("dateEnd", event.getDateEnd());
+                            groupEvent.put("isAllDay", event.isAllDay());
+                            groupEvent.saveInBackground(new SaveCallback() {
                                 @Override
-                                public void done(ParseObject userevent, ParseException e) {
-                                    if (e == null) {
-                                        progressDialog.cancel();
-                                        EventBean eventUser = new EventBean(userevent.getObjectId(),
-                                                userevent.getString("groupEvent"), userevent.getString("description"),
-                                                userevent.getString("timeStart"), userevent.getString("timeEnd"),
-                                                userevent.getString("location"), userevent.getString("dateStart"),
-                                                userevent.getString("dateEnd"), userevent.getString("username"));
-
-                                        progressDialog.dismiss();
-                                        showSameEvent(eventUser.getEvent(), eventUser.getLocation(), eventUser.getDateStart(), eventUser.getTimeStart(), eventUser.getTimeEnd());
-                                    } else {
-                                        progressDialog.cancel();
-                                        ParseObject groupEvent = new ParseObject("GroupEvent");
-                                        groupEvent.put("eventId", event.getId());
-                                        groupEvent.put("groupId", member.getGroupId());
-                                        groupEvent.put("groupName", member.getGroupName());
-                                        groupEvent.put("userId", ParseUser.getCurrentUser().getObjectId());
-                                        groupEvent.put("username", ParseUser.getCurrentUser().getUsername());
-                                        groupEvent.put("groupEvent", event.getEvent());
-                                        groupEvent.put("description", event.getDescription());
-                                        groupEvent.put("location", event.getLocation());
-                                        groupEvent.put("year", event.getYear());
-                                        groupEvent.put("month", event.getMonth());
-                                        groupEvent.put("day", event.getDay());
-                                        groupEvent.put("isCompleted", false);
-                                        groupEvent.put("isSharable", false);
-                                        groupEvent.put("timeStart", event.getTimeStart());
-                                        groupEvent.put("timeEnd", event.getTimeEnd());
-                                        groupEvent.put("dateStart", event.getDateStart());
-                                        groupEvent.put("dateEnd", event.getDateEnd());
-                                        groupEvent.put("isAllDay", event.isAllDay());
-                                        groupEvent.saveInBackground(new SaveCallback() {
-                                            @Override
-                                            public void done(ParseException e) {
-                                                progressDialog.cancel();
-                                                intent = new Intent(ShareEventActivity.this, MainActivity.class);
-                                                intent.putExtra("Activity", "NewEvent");
-                                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                startActivity(intent);
-                                                Toast.makeText(ShareEventActivity.this, "Event Successfully Shared", Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
-                                    }
+                                public void done(ParseException e) {
+                                    progressDialog.cancel();
+                                    intent = new Intent(ShareEventActivity.this, MainActivity.class);
+                                    intent.putExtra("Activity", "NewEvent");
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(intent);
+                                    Toast.makeText(ShareEventActivity.this, "Event Successfully Shared", Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }
@@ -213,9 +188,9 @@ public class ShareEventActivity extends AppCompatActivity {
                 }
                 listAdapter.notifyDataSetChanged();
 
-                if(list.size() == 0){
+                if (list.size() == 0) {
                     emptyView.setVisibility(View.VISIBLE);
-                }else{
+                } else {
                     emptyView.setVisibility(View.GONE);
                 }
             }

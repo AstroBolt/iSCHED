@@ -183,7 +183,7 @@ public class NewTaskActivity extends AppCompatActivity implements
             routines.put("DueDate", dateNow);
             routines.put("Priority", selectedPriority);
             routines.put("isCompleted", false);
-            routines.addAllUnique("SelectedDay", selectedDayIndexList);
+            routines.put("SelectedDay", selectedDayIndexList);
             routines.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(ParseException e) {

@@ -87,7 +87,7 @@ public class TaskInterfaceActivity extends AppCompatActivity {
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-
+                viewPager.clearOnPageChangeListeners();
             }
 
             @Override

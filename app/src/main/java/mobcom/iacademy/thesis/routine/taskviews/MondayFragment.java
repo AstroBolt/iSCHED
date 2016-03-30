@@ -34,9 +34,11 @@ import mobcom.iacademy.thesis.routine.controller.EditTaskActivity;
 
 public class MondayFragment extends Fragment {
 
+
+    public static final String LOG_TAG = "MondayFragment";
     Context context;
     TaskAdapter adapter;
-    private List<TaskBean> posts = new ArrayList<>();
+    private List<TaskBean> posts;
     private RoutineBean routine = new RoutineBean();
     private Intent intent;
     RecyclerView rv;
@@ -80,15 +82,14 @@ public class MondayFragment extends Fragment {
                             routine.getRoutineAdmin(),
                             routine.getRoutineName());
                 }catch (IndexOutOfBoundsException ibe){
-                    Toast.makeText(getActivity().getApplicationContext(), ibe.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.d(LOG_TAG, ibe.getMessage());
                 }
             }
         });
         return root;
     }
 
-    private void getMondayTasks() {
-        //Sunday
+    private void getMondayTasks() { //Sunday
         progressBar.setVisibility(View.VISIBLE);
         posts = new ArrayList<>();
         adapter = new TaskAdapter(posts);

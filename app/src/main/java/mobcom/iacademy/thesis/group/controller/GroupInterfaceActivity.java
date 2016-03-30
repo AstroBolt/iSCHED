@@ -1,4 +1,4 @@
-package mobcom.iacademy.thesis.group;
+package mobcom.iacademy.thesis.group.controller;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -50,9 +50,9 @@ import mobcom.iacademy.thesis.event.utilities.EventDecorator;
 import mobcom.iacademy.thesis.event.utilities.HighlightWeekendsDecorator;
 import mobcom.iacademy.thesis.event.utilities.MySelectorDecorator;
 import mobcom.iacademy.thesis.event.utilities.OneDayDecorator;
-import mobcom.iacademy.thesis.event.controller.EditEventActivity;
 import mobcom.iacademy.thesis.event.model.DayBean;
 import mobcom.iacademy.thesis.event.model.EventBean;
+import mobcom.iacademy.thesis.group.ShareGroupEventActivity;
 import mobcom.iacademy.thesis.group.model.GroupBean;
 
 public class GroupInterfaceActivity extends AppCompatActivity implements OnDateSelectedListener, OnMonthChangedListener {
@@ -70,6 +70,7 @@ public class GroupInterfaceActivity extends AppCompatActivity implements OnDateS
     private ProgressBar progressBar;
     private List<EventBean> list;
     private DayBean day;
+    EventBean event;
 
 
     @Override
@@ -100,7 +101,7 @@ public class GroupInterfaceActivity extends AppCompatActivity implements OnDateS
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(GroupInterfaceActivity.this, NewGroupEvent.class);
+                Intent intent = new Intent(GroupInterfaceActivity.this, mobcom.iacademy.thesis.group.NewGroupEvent.class);
                 intent.putExtra("groupId", groupBean.getId());
                 intent.putExtra("groupAdmin", groupBean.getGroupAdmin());
                 intent.putExtra("groupName", groupBean.getGroupName());
@@ -163,7 +164,7 @@ public class GroupInterfaceActivity extends AppCompatActivity implements OnDateS
         eventAdapter.SetOnItemClickListener(new EventAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                EventBean event = list.get(position);
+                event = list.get(position);
                 Intent intent = new Intent(GroupInterfaceActivity.this, EditEventActivity.class);
                 intent.putExtra("eventId", event.getId());
                 intent.putExtra("eventTitle", event.getEvent());
@@ -207,7 +208,22 @@ public class GroupInterfaceActivity extends AppCompatActivity implements OnDateS
         alertDialog.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(GroupInterfaceActivity.this, "Edit", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(GroupInterfaceActivity.this, EditEventActivity.class);
+                intent.putExtra("eventId", event.getId());
+                intent.putExtra("eventTitle", event.getEvent());
+                intent.putExtra("eventLocation", event.getLocation());
+                intent.putExtra("eventDateStart", event.getDateStart());
+                intent.putExtra("eventDateEnd", event.getDateEnd());
+                intent.putExtra("eventTimeStart", event.getTimeStart());
+                intent.putExtra("eventTimeEnd", event.getTimeEnd());
+                intent.putExtra("eventContent", event.getDescription());
+                intent.putExtra("eventOwner", event.getUsername());
+                intent.putExtra("groupId", groupBean.getId());
+                intent.putExtra("groupAdmin", groupBean.getGroupAdmin());
+                intent.putExtra("groupName", groupBean.getGroupName());
+                intent.putExtra("id", groupBean.getGroupId());
+                startActivity(intent);
+
             }
         });
 

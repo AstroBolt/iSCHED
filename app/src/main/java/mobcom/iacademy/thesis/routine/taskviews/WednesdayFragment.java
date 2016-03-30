@@ -37,7 +37,7 @@ public class WednesdayFragment extends Fragment {
 
     Context context;
     TaskAdapter adapter;
-    private List<TaskBean> posts = new ArrayList<>();
+    private List<TaskBean> posts;
     private RoutineBean routine = new RoutineBean();
     private Intent intent;
     RecyclerView rv;

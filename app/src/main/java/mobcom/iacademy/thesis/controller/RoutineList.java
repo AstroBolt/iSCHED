@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ListFragment;
 import android.support.v4.view.MenuItemCompat;
@@ -33,7 +34,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +65,19 @@ public class RoutineList extends ListFragment {
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         emptyView = (TextView) view.findViewById(R.id.empty);
         emptyView.setVisibility(View.GONE);
-        populateListView();
+
+        //set delay
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // Do something after 1s = 1000ms
+                progressBar.setVisibility(View.VISIBLE);
+                populateListView();
+            }
+        }, 1500);
+
+
         FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,14 +126,29 @@ public class RoutineList extends ListFragment {
     }
 
     private void populateListView() {
-        progressBar.setVisibility(View.VISIBLE);
         routine = new ArrayList<>();
         mAdapter = new ArrayAdapter<>(getActivity(), R.layout.listview_row, routine);
         setListAdapter(mAdapter);
         ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo ni = cm.getActiveNetworkInfo();
         if ((ni != null) && (ni.isConnected())) {
+
+
+            ParseQuery<ParseObject> query2 = ParseQuery.getQuery("RoutineGroup");
+            query2.findInBackground(new FindCallback<ParseObject>() {
+                @Override
+                public void done(List<ParseObject> list, ParseException e) {
+                    if(e == null){
+                        ParseObject.pinAllInBackground(list);
+                    }else{
+                        Toast.makeText(getActivity().getApplicationContext(), "ERROR", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
+
             ParseQuery<ParseObject> query = ParseQuery.getQuery("RoutineGroup");
+            query.fromLocalDatastore();
             query.whereEqualTo("username", ParseUser.getCurrentUser().getObjectId());
             query.whereEqualTo("isDeleted", false);
             query.findInBackground(new FindCallback<ParseObject>() {
@@ -133,18 +161,22 @@ public class RoutineList extends ListFragment {
                             RoutineBean routineBean = new RoutineBean(post.getObjectId(), post.getString("routineGroup"), post.getString("username"));
                             routine.add(routineBean);
                         }
-                        ((ArrayAdapter<RoutineBean>) getListAdapter()).notifyDataSetChanged();
 
-                        if(list.size() == 0){
+                        if (list.size() == 0) {
                             emptyView.setVisibility(View.VISIBLE);
-                        }else{
+                        } else {
                             emptyView.setVisibility(View.GONE);
                         }
+
+                        ((ArrayAdapter<RoutineBean>) getListAdapter()).notifyDataSetChanged();
+
                     } else {
                         Log.d(getClass().getSimpleName(), "Error: " + e.getMessage());
                     }
                 }
             });
+
+
         }else{
             progressBar.setVisibility(View.GONE);
             // If there is no connection, let the user know the sync didn't happen
@@ -164,6 +196,7 @@ public class RoutineList extends ListFragment {
         NetworkInfo ni = cm.getActiveNetworkInfo();
         if ((ni != null) && (ni.isConnected())) {
             ParseQuery<ParseObject> query = ParseQuery.getQuery("RoutineGroup");
+            query.fromLocalDatastore();
             query.whereStartsWith("routineGroup", userRoutine.toUpperCase());
             query.whereEqualTo("username", ParseUser.getCurrentUser().getObjectId());
             query.whereEqualTo("isDeleted", false);
@@ -202,6 +235,7 @@ public class RoutineList extends ListFragment {
     }
 
     private void onSearchTextSubmit(String userRoutine) {
+
         progressBar.setVisibility(View.VISIBLE);
         routine = new ArrayList<>();
         mAdapter = new ArrayAdapter<>(getActivity(), R.layout.listview_row, routine);
@@ -210,6 +244,7 @@ public class RoutineList extends ListFragment {
         NetworkInfo ni = cm.getActiveNetworkInfo();
         if ((ni != null) && (ni.isConnected())) {
             ParseQuery<ParseObject> query = ParseQuery.getQuery("RoutineGroup");
+            query.fromLocalDatastore();
             query.whereEqualTo("routineGroup", userRoutine.toUpperCase());
             query.whereEqualTo("username", ParseUser.getCurrentUser().getObjectId());
             query.whereEqualTo("isDeleted", false);
@@ -291,18 +326,8 @@ public class RoutineList extends ListFragment {
             routine.put("routineGroup", routineName.toUpperCase());
             routine.put("username", ParseUser.getCurrentUser().getObjectId());
             routine.put("isDeleted", false);
-            routine.saveInBackground(new SaveCallback() {
-                @Override
-                public void done(ParseException e) {
-                    if (e == null) {
-                        progressDialog.cancel();
-                        populateListView();
-                    } else {
-                        progressDialog.cancel();
-                        Log.d("ParseError", e.getMessage());
-                    }
-                }
-            });
+            routine.saveEventually();
+            Toast.makeText(getActivity().getApplicationContext(), "Routine Successfully Created.", Toast.LENGTH_SHORT).show();
         } else {
             progressDialog.cancel();
             // If there is no connection, let the user know the sync didn't happen

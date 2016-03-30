@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mobcom.iacademy.thesis.R;
-import mobcom.iacademy.thesis.group.GroupInterfaceActivity;
+import mobcom.iacademy.thesis.group.controller.GroupInterfaceActivity;
 import mobcom.iacademy.thesis.group.model.GroupBean;
 import mobcom.iacademy.thesis.routine.model.RoutineBean;
 

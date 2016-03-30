@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -26,6 +27,7 @@ import android.widget.Toast;
 
 import com.parse.DeleteCallback;
 import com.parse.LogOutCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
@@ -64,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         lvNav = (ListView) findViewById(R.id.nav_list);
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
 
+        setSupportActionBar(toolbar);
 
 
 
@@ -90,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
         fragTran = fragmentManager.beginTransaction();
         fragTran.replace(R.id.containerView, new RoutineList());
         fragTran.addToBackStack(null);
+        toolbar.setTitle("Routine");
         fragTran.commit();
         lvNav.setItemChecked(0, true);
         drawerLayout.closeDrawer(drawerPanel);
@@ -99,20 +103,20 @@ public class MainActivity extends AppCompatActivity {
             String activity = intent.getStringExtra("Activity");
             switch (activity){
                 case "NewEvent":
-                    setSupportActionBar(toolbar);
+
                     getSupportActionBar().setTitle("Events");
                     fragmentManager.beginTransaction().replace(R.id.containerView, listFragments.get(1)).commit();
                     lvNav.setItemChecked(1, true);
                     break;
                 case "New Routine":
-                    setSupportActionBar(toolbar);
+
                     getSupportActionBar().setTitle("Routines");
                     lvNav.setItemChecked(0, true);
                     fragmentManager.beginTransaction().replace(R.id.containerView, listFragments.get(0)).commit();
                     break;
 
                 case "New Group":
-                    setSupportActionBar(toolbar);
+
                     getSupportActionBar().setTitle("Groups");
                     lvNav.setItemChecked(2, true);
                     fragmentManager.beginTransaction().replace(R.id.containerView, listFragments.get(2)).commit();
@@ -131,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (position == 0) {
                     fragmentManager.beginTransaction().replace(R.id.containerView, listFragments.get(0)).commit();
-                    setSupportActionBar(toolbar);
+
                     toolbar.setTitle(listNavItems.get(position).getTitle());
                     lvNav.setItemChecked(position, true);
                     drawerLayout.closeDrawer(drawerPanel);
@@ -139,14 +143,14 @@ public class MainActivity extends AppCompatActivity {
                 if (position == 1) {
 
                     fragmentManager.beginTransaction().replace(R.id.containerView, listFragments.get(1)).commit();
-                    setSupportActionBar(toolbar);
+
                     toolbar.setTitle(listNavItems.get(position).getTitle());
                     lvNav.setItemChecked(position, true);
                     drawerLayout.closeDrawer(drawerPanel);
                 }
                 if (position == 2) {
                     fragmentManager.beginTransaction().replace(R.id.containerView, listFragments.get(2)).commit();
-                    setSupportActionBar(toolbar);
+
                     toolbar.setTitle(listNavItems.get(position).getTitle());
                     lvNav.setItemChecked(position, true);
                     drawerLayout.closeDrawer(drawerPanel);
@@ -185,11 +189,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         if(getSupportActionBar() != null){
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }else{
-            getActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         }
         actionBarDrawerToggle.syncState();
