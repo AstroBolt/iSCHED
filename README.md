@@ -1,4 +1,4 @@
-# iSCHED
+# iSCHED (In Progress)
 iSCHED (Thesis Project)
 Centralized Scheduler App for students, teachers and employees of iACADEMY.
 
