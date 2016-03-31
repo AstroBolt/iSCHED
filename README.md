@@ -39,7 +39,7 @@ https://github.com/DreaminginCodeZH/MaterialProgressBar
 
 
 #Screenshots
-![alt tag](https://fbcdn-sphotos-e-a.akamaihd.net/hphotos-ak-xpa1/v/t34.0-12/12910728_10205464314201417_1002049648_n.png?oh=35774acea57c8e31e026b7dbede26616&oe=56FF7890&__gda__=1459565373_c31f3504e428fd56a41a08506c5046c4.png "Description goes here")
+!(http://s9.postimg.org/5nf6o6c6n/screenshot1.jpg "Description goes here")
 
 #License
 
