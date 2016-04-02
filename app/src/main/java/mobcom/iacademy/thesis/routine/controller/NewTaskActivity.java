@@ -175,21 +175,23 @@ public class NewTaskActivity extends AppCompatActivity implements
         NetworkInfo ni = cm.getActiveNetworkInfo();
         if ((ni != null) && (ni.isConnected())) {
             ParseObject routines = new ParseObject("Routine");
-            routines.put("username", ParseUser.getCurrentUser().getUsername());
+            routines.put("username", ParseUser.getCurrentUser());
             routines.put("timeStart", timeStartFormat);
             routines.put("routineGroup", routineBean.getId());
+            routines.put("routineName", routineBean.getRoutineName());
             routines.put("Title", taskTitle.getText().toString());
             routines.put("Content", taskContent.getText().toString());
             routines.put("DueDate", dateNow);
             routines.put("Priority", selectedPriority);
             routines.put("isCompleted", false);
             routines.put("SelectedDay", selectedDayIndexList);
+            routines.pinInBackground();
             routines.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(ParseException e) {
                     if(e == null){
                         progressDialog.dismiss();
-                        intent = new Intent(NewTaskActivity.this, TaskInterfaceActivity.class);
+                        intent = new Intent(NewTaskActivity.this, TaskActivityFixed.class);
                         intent.putExtra("groupId", routineBean.getId());
                         intent.putExtra("groupName", routineBean.getRoutineName());
                         intent.putExtra("groupAdmin", routineBean.getRoutineAdmin());
@@ -362,7 +364,7 @@ public class NewTaskActivity extends AppCompatActivity implements
                 break;
 
             case R.id.action_cancel:
-                intent = new Intent(NewTaskActivity.this, TaskInterfaceActivity.class);
+                intent = new Intent(NewTaskActivity.this, TaskActivityFixed.class);
                 intent.putExtra("groupId", routineBean.getId());
                 intent.putExtra("groupName", routineBean.getRoutineName());
                 intent.putExtra("groupAdmin", routineBean.getRoutineAdmin());

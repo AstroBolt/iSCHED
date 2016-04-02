@@ -26,14 +26,12 @@
         <activity
             android:name=".login.RegisterActivity"
             android:label="Register" />
-        <activity android:name=".routine.controller.TaskInterfaceActivity" />
         <activity android:name=".routine.controller.NewTaskActivity" />
         <activity android:name=".routine.controller.EditTaskActivity" />
         <activity android:name=".group.controller.EditEventActivity" />
         <activity android:name=".event.controller.NewEventActivity" />
         <activity android:name=".event.controller.EditEventActivity" />
         <activity android:name=".group.controller.GroupInterfaceActivity" />
-
         <activity android:name=".group.controller.AddMemberActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
@@ -75,11 +73,13 @@
                 android:value=".group.RemoveMemberActivity" />
         </activity>
         <activity android:name=".group.NewGroupEvent" />
-        <activity android:name=".event.controller.TestActivity">
-        </activity>
+        <activity android:name=".event.controller.TestActivity"></activity>
+
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
+        <activity android:name=".routine.controller.TaskActivityFixed"></activity>
     </application>
 
 </manifest>

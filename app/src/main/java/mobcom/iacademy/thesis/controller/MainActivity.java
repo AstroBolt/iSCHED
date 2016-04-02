@@ -12,7 +12,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -26,9 +25,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.DeleteCallback;
+import com.parse.FindCallback;
 import com.parse.LogOutCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -38,7 +39,6 @@ import mobcom.iacademy.thesis.R;
 import mobcom.iacademy.thesis.login.Interceptor;
 import mobcom.iacademy.thesis.utilities.NavItem;
 import mobcom.iacademy.thesis.utilities.NavListAdapter;
-
 
 
 public class MainActivity extends AppCompatActivity {
@@ -68,8 +68,6 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
 
-
-
         //get user credentials
         username = (TextView) findViewById(R.id.profileUsername);
         email = (TextView) findViewById(R.id.profileEmail);
@@ -98,10 +96,12 @@ public class MainActivity extends AppCompatActivity {
         lvNav.setItemChecked(0, true);
         drawerLayout.closeDrawer(drawerPanel);
 
+        populateLocalDataStore();
+
         intent = this.getIntent();
-        if(intent.getExtras() != null){
+        if (intent.getExtras() != null) {
             String activity = intent.getStringExtra("Activity");
-            switch (activity){
+            switch (activity) {
                 case "NewEvent":
 
                     getSupportActionBar().setTitle("Events");
@@ -161,9 +161,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
-
-
         //create listener for drawer layout
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_opened, R.string.drawer_close) {
             @Override
@@ -190,11 +187,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
-        if(getSupportActionBar() != null){
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }else{
+        } else {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         }
@@ -289,6 +285,24 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         Log.d("Back Button", "Pressed");
         finishAffinity();
+    }
+
+    private void populateLocalDataStore(){
+        ParseQuery<ParseObject> query2 = ParseQuery.getQuery("RoutineGroup");
+        query2.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> list, ParseException e) {
+                ParseObject.pinAllInBackground(list);
+            }
+        });
+
+        ParseQuery<ParseObject> query3 = ParseQuery.getQuery("Routine");
+        query3.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> list, ParseException e) {
+                ParseObject.pinAllInBackground(list);
+            }
+        });
     }
 
 }

@@ -34,14 +34,15 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 
 import java.util.ArrayList;
 import java.util.List;
 
 import mobcom.iacademy.thesis.R;
+import mobcom.iacademy.thesis.routine.controller.TaskActivityFixed;
 import mobcom.iacademy.thesis.routine.model.RoutineBean;
-import mobcom.iacademy.thesis.routine.controller.TaskInterfaceActivity;
 
 @SuppressWarnings("all")
 @TargetApi(11)
@@ -118,7 +119,7 @@ public class RoutineList extends ListFragment {
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
         RoutineBean routineBean = routine.get(position);
-        Intent intent = new Intent(getActivity().getApplication(), TaskInterfaceActivity.class);
+        Intent intent = new Intent(getActivity().getApplication(), TaskActivityFixed.class);
         intent.putExtra("groupId", routineBean.getId());
         intent.putExtra("groupName", routineBean.getRoutineName());
         intent.putExtra("groupAdmin", routineBean.getRoutineAdmin());
@@ -132,20 +133,6 @@ public class RoutineList extends ListFragment {
         ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo ni = cm.getActiveNetworkInfo();
         if ((ni != null) && (ni.isConnected())) {
-
-
-            ParseQuery<ParseObject> query2 = ParseQuery.getQuery("RoutineGroup");
-            query2.findInBackground(new FindCallback<ParseObject>() {
-                @Override
-                public void done(List<ParseObject> list, ParseException e) {
-                    if(e == null){
-                        ParseObject.pinAllInBackground(list);
-                    }else{
-                        Toast.makeText(getActivity().getApplicationContext(), "ERROR", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-
 
             ParseQuery<ParseObject> query = ParseQuery.getQuery("RoutineGroup");
             query.fromLocalDatastore();
@@ -272,6 +259,7 @@ public class RoutineList extends ListFragment {
             });
         }else{
             progressBar.setVisibility(View.GONE);
+            emptyView.setVisibility(View.VISIBLE);
             // If there is no connection, let the user know the sync didn't happen
             Toast.makeText(
                     getActivity().getApplicationContext(),
@@ -326,8 +314,15 @@ public class RoutineList extends ListFragment {
             routine.put("routineGroup", routineName.toUpperCase());
             routine.put("username", ParseUser.getCurrentUser().getObjectId());
             routine.put("isDeleted", false);
-            routine.saveEventually();
-            Toast.makeText(getActivity().getApplicationContext(), "Routine Successfully Created.", Toast.LENGTH_SHORT).show();
+            routine.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    progressDialog.cancel();
+                    populateListView();
+                    Toast.makeText(getActivity().getApplicationContext(), "Routine Successfully Created.", Toast.LENGTH_SHORT).show();
+                }
+            });
+
         } else {
             progressDialog.cancel();
             // If there is no connection, let the user know the sync didn't happen

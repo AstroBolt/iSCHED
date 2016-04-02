@@ -89,7 +89,7 @@ public class EditTaskActivity extends AppCompatActivity implements
                 break;
 
             case android.R.id.home:
-                intent = new Intent(EditTaskActivity.this, TaskInterfaceActivity.class);
+                intent = new Intent(EditTaskActivity.this, TaskActivityFixed.class);
                 intent.putExtra("groupId", routineBean.getId());
                 intent.putExtra("groupName", routineBean.getRoutineName());
                 intent.putExtra("groupAdmin", routineBean.getRoutineAdmin());
@@ -122,13 +122,16 @@ public class EditTaskActivity extends AppCompatActivity implements
                     intent.getStringExtra("groupName"),
                     intent.getStringExtra("groupAdmin"));
 
-            note = new TaskBean(intent.getStringExtra("noteId"),
+
+            note = new TaskBean(
+                    intent.getStringExtra("noteId"),
                     intent.getStringExtra("noteTitle"),
                     intent.getStringExtra("noteContent"),
                     intent.getStringExtra("noteDate"),
                     intent.getStringExtra("notePriority"),
-                    intent.getStringExtra("noteUsername"),
-                    intent.getStringExtra("noteGroupName"),
+                    intent.getStringExtra("groupId"),
+                    intent.getStringExtra("routineName"),
+                    intent.getStringExtra(ParseUser.getCurrentUser().getUsername()),
                     intent.getStringExtra("timeStart"));
 
 
@@ -259,15 +262,16 @@ public class EditTaskActivity extends AppCompatActivity implements
                             query.getInBackground(note.getId(), new GetCallback<ParseObject>() {
                                 @Override
                                 public void done(ParseObject parseObject, ParseException e) {
+                                    parseObject.unpinInBackground();
                                     parseObject.put("isCompleted", true);
                                     parseObject.saveInBackground(new SaveCallback() {
                                         @Override
                                         public void done(ParseException e) {
                                             progressDialog.cancel();
-                                            intent = new Intent(EditTaskActivity.this, TaskInterfaceActivity.class);
-                                            intent.putExtra("groupId", routineBean.getId());
-                                            intent.putExtra("groupName", routineBean.getRoutineName());
-                                            intent.putExtra("groupAdmin", routineBean.getRoutineAdmin());
+                                            intent = new Intent(EditTaskActivity.this, TaskActivityFixed.class);
+                                            intent.putExtra("groupId", note.getRoutineGroup());
+                                            intent.putExtra("groupName", note.getRoutineName());
+                                            intent.putExtra("groupAdmin", note.getUsername());
                                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                                             startActivity(intent);
                                         }
@@ -311,15 +315,16 @@ public class EditTaskActivity extends AppCompatActivity implements
                     parseObject.put("Priority", selectedPriority);
                     parseObject.put("isCompleted", false);
                     parseObject.addAllUnique("SelectedDay", selectedDayIndexList);
+                    parseObject.pinInBackground();
                     parseObject.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
                             if (e == null) {
                                 progressDialog.cancel();
-                                intent = new Intent(EditTaskActivity.this, TaskInterfaceActivity.class);
-                                intent.putExtra("groupId", routineBean.getId());
-                                intent.putExtra("groupName", routineBean.getRoutineName());
-                                intent.putExtra("groupAdmin", routineBean.getRoutineAdmin());
+                                intent = new Intent(EditTaskActivity.this, TaskActivityFixed.class);
+                                intent.putExtra("groupId", note.getRoutineGroup());
+                                intent.putExtra("groupName", note.getRoutineName());
+                                intent.putExtra("groupAdmin", note.getUsername());
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
                             } else {

@@ -8,25 +8,32 @@ public class TaskBean {
     private String dueDate;
     private String priority;
     private String routineGroup;
+    private String routineName;
     private String username;
     private String timeStart;
     private Boolean isCompleted;
     private int photo;
 
-    public TaskBean(){
-
-    }
 
 
-    public TaskBean(String id, String title, String content, String dueDate, String priority, String routineGroup, String username, String timeStart) {
+    public TaskBean(String id, String title, String content, String dueDate, String priority, String routineGroup, String routineName, String username, String timeStart) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.dueDate = dueDate;
         this.priority = priority;
         this.routineGroup = routineGroup;
+        this.routineName = routineName;
         this.username = username;
         this.timeStart = timeStart;
+    }
+
+    public String getRoutineName() {
+        return routineName;
+    }
+
+    public void setRoutineName(String routineName) {
+        this.routineName = routineName;
     }
 
     public String getId() {
