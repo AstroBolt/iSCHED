@@ -263,6 +263,7 @@ public class Event extends Fragment implements OnDateSelectedListener, OnMonthCh
             String currentUser = ParseUser.getCurrentUser().getObjectId();
             String[] names = {currentUser, "holiday"};
             ParseQuery<ParseObject> userGroup = ParseQuery.getQuery("Event");
+            userGroup.fromLocalDatastore();
             userGroup.whereEqualTo("isCompleted", false);
             userGroup.whereContainedIn("username", Arrays.asList(names));
             userGroup.findInBackground(new FindCallback<ParseObject>() {

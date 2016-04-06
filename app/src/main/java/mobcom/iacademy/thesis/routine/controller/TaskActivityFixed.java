@@ -74,6 +74,7 @@ public class TaskActivityFixed extends AppCompatActivity {
         setupViewPager(viewPager);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabanim_tabs);
+        tab
         tabLayout.setupWithViewPager(viewPager);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);

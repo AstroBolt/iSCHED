@@ -126,6 +126,7 @@ public class Group extends ListFragment {
         NetworkInfo ni = cm.getActiveNetworkInfo();
         if ((ni != null) && (ni.isConnected())) {
             ParseQuery<ParseObject> query = ParseQuery.getQuery("GroupMembers");
+            query.fromLocalDatastore();
             query.whereEqualTo("userId", ParseUser.getCurrentUser().getObjectId());
             query.whereEqualTo("isDeleted", false);
             query.findInBackground(new FindCallback<ParseObject>() {

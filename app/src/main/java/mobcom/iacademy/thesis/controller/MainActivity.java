@@ -303,6 +303,22 @@ public class MainActivity extends AppCompatActivity {
                 ParseObject.pinAllInBackground(list);
             }
         });
+
+        ParseQuery<ParseObject> query4 = ParseQuery.getQuery("GroupMembers");
+        query4.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> list, ParseException e) {
+                ParseObject.pinAllInBackground(list);
+            }
+        });
+
+        ParseQuery<ParseObject> query5 = ParseQuery.getQuery("Event");
+        query5.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> list, ParseException e) {
+                ParseObject.pinAllInBackground(list);
+            }
+        });
     }
 
 }
