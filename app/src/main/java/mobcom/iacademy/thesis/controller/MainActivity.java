@@ -15,20 +15,22 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.DeleteCallback;
-import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.LogOutCallback;
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
@@ -43,18 +45,18 @@ import mobcom.iacademy.thesis.utilities.NavListAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
-    private RelativeLayout profileBox;
-    private DrawerLayout drawerLayout;
-    private RelativeLayout drawerPanel;
-    private ListView lvNav;
-    private TextView username, email;
-    private List<NavItem> listNavItems;
-    private List<Fragment> listFragments;
-    private Intent intent;
-    private ActionBarDrawerToggle actionBarDrawerToggle;
-    private FragmentManager fragmentManager = getSupportFragmentManager();
-    private FragmentTransaction fragTran = fragmentManager.beginTransaction();
-    private Toolbar toolbar;
+    RelativeLayout profileBox;
+    DrawerLayout drawerLayout;
+    RelativeLayout drawerPanel;
+    ListView lvNav;
+    TextView username, email;
+    List<NavItem> listNavItems;
+    List<Fragment> listFragments;
+    Intent intent;
+    ActionBarDrawerToggle actionBarDrawerToggle;
+    FragmentManager fragmentManager = getSupportFragmentManager();
+    FragmentTransaction fragTran;
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,8 +97,6 @@ public class MainActivity extends AppCompatActivity {
         fragTran.commit();
         lvNav.setItemChecked(0, true);
         drawerLayout.closeDrawer(drawerPanel);
-
-        populateLocalDataStore();
 
         intent = this.getIntent();
         if (intent.getExtras() != null) {
@@ -201,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
     private void userProfile() {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Help and Settings");
-        String[] types = {"Reset Password", "Delete Account", "Logout"};
+        String[] types = {"Change Username", "Reset Password", "Delete Account", "Logout"};
         builder.setItems(types, new DialogInterface.OnClickListener() {
 
             @Override
@@ -209,9 +209,12 @@ public class MainActivity extends AppCompatActivity {
                 dialog.dismiss();
                 switch (which) {
                     case 0:
-                        Toast.makeText(MainActivity.this, "Reset", Toast.LENGTH_SHORT).show();
+                        inputDialog();
                         break;
                     case 1:
+                        Toast.makeText(MainActivity.this, "Reset", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 2:
                         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                         builder.setTitle("Delete Account");
                         builder.setMessage("Are you sure you want to delete your account?");
@@ -239,7 +242,7 @@ public class MainActivity extends AppCompatActivity {
                         builder.setNegativeButton("NO", null);
                         builder.show();
                         break;
-                    case 2:
+                    case 3:
                         final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
                         progressDialog.setMessage(getString(R.string.action_logout));
                         progressDialog.setCancelable(false);
@@ -257,6 +260,53 @@ public class MainActivity extends AppCompatActivity {
 
         });
         builder.show();
+    }
+
+    private void inputDialog() {
+
+        //get prompts.xml
+        LayoutInflater li = LayoutInflater.from(this);
+        View promptsView = li.inflate(R.layout.prompt_dialog, null);
+        AlertDialog.Builder alBuilder = new AlertDialog.Builder(this);
+
+        //set dialog message
+        alBuilder.setMessage("Change Username");
+
+        //set prompts.xml to alert dialog builder
+        alBuilder.setView(promptsView);
+
+        final EditText userInput = (EditText) promptsView.findViewById(R.id.editTextDialogUserInput);
+        userInput.setText(ParseUser.getCurrentUser().getUsername());
+
+        alBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                final String userPrompt = userInput.getText().toString();
+
+                if (!TextUtils.isEmpty(userPrompt)) {
+
+                    ParseQuery<ParseUser> query = ParseUser.getQuery();
+                    query.getInBackground(ParseUser.getCurrentUser().getObjectId(), new GetCallback<ParseUser>() {
+                        @Override
+                        public void done(ParseUser parseUser, ParseException e) {
+                           if(e == null){
+                               parseUser.setUsername(userPrompt);
+                               parseUser.saveEventually();
+                               Toast.makeText(MainActivity.this, "Username Successfully Updated", Toast.LENGTH_SHORT).show();
+                           }else{
+                               Toast.makeText(MainActivity.this, "Username Not Updated", Toast.LENGTH_SHORT).show();
+                           }
+                        }
+                    });
+
+
+                } else {
+                    Toast.makeText(MainActivity.this, "Missing Fields", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }).setNegativeButton("Cancel", null);
+        AlertDialog alertDialog = alBuilder.create();
+        alertDialog.show();
     }
 
     @Override
@@ -286,39 +336,4 @@ public class MainActivity extends AppCompatActivity {
         Log.d("Back Button", "Pressed");
         finishAffinity();
     }
-
-    private void populateLocalDataStore(){
-        ParseQuery<ParseObject> query2 = ParseQuery.getQuery("RoutineGroup");
-        query2.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> list, ParseException e) {
-                ParseObject.pinAllInBackground(list);
-            }
-        });
-
-        ParseQuery<ParseObject> query3 = ParseQuery.getQuery("Routine");
-        query3.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> list, ParseException e) {
-                ParseObject.pinAllInBackground(list);
-            }
-        });
-
-        ParseQuery<ParseObject> query4 = ParseQuery.getQuery("GroupMembers");
-        query4.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> list, ParseException e) {
-                ParseObject.pinAllInBackground(list);
-            }
-        });
-
-        ParseQuery<ParseObject> query5 = ParseQuery.getQuery("Event");
-        query5.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> list, ParseException e) {
-                ParseObject.pinAllInBackground(list);
-            }
-        });
-    }
-
 }

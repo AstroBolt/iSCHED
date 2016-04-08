@@ -37,7 +37,7 @@ public class SimpleRecyclerAdapter extends RecyclerView.Adapter<SimpleRecyclerAd
 
     @Override
     public VersionViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.recyclerlist_item, viewGroup, false);
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.task_list, viewGroup, false);
         VersionViewHolder viewHolder = new VersionViewHolder(view);
         return viewHolder;
     }
@@ -45,6 +45,9 @@ public class SimpleRecyclerAdapter extends RecyclerView.Adapter<SimpleRecyclerAd
     @Override
     public void onBindViewHolder(VersionViewHolder holder, final int position) {
         holder.title.setText(taskBean.get(position).getTitle());
+        holder.timeStart.setText(taskBean.get(position).getTimeStart());
+        holder.priority.setText(taskBean.get(position).getPriority());
+
 
         holder.cardItemLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,12 +68,11 @@ public class SimpleRecyclerAdapter extends RecyclerView.Adapter<SimpleRecyclerAd
                         intent.putExtra("noteContent", taskBean.get(position).getContent());
                         intent.putExtra("noteDate", taskBean.get(position).getDueDate());
                         intent.putExtra("notePriority", taskBean.get(position).getPriority());
-                        intent.putExtra("noteUsername", taskBean.get(position).getUsername());
-                        intent.putExtra("noteGroupName", taskBean.get(position).getRoutineGroup());
+                        intent.putExtra("noteUsername", ParseUser.getCurrentUser().getUsername());
                         intent.putExtra("timeStart", taskBean.get(position).getTimeStart());
-                        intent.putExtra("groupId", taskBean.get(position).getRoutineGroup());
-                        intent.putExtra("groupAdmin", taskBean.get(position).getRoutineName());
-                        intent.putExtra("groupName", ParseUser.getCurrentUser().getUsername());
+                        intent.putExtra("groupId", taskBean.get(position).getRoutineId());
+                        intent.putExtra("groupAdmin", ParseUser.getCurrentUser().getUsername());
+                        intent.putExtra("groupName",  taskBean.get(position).getRoutineGroup());
                         context.startActivity(intent);
                     }
                 }).setNegativeButton("Cancel", null).show();
@@ -101,9 +103,12 @@ public class SimpleRecyclerAdapter extends RecyclerView.Adapter<SimpleRecyclerAd
         public VersionViewHolder(View itemView) {
             super(itemView);
 
-            cardItemLayout = (CardView) itemView.findViewById(R.id.cardlist_item);
-            title = (TextView) itemView.findViewById(R.id.listitem_name);
-
+            cardItemLayout = (CardView) itemView.findViewById(R.id.cv);
+            title = (TextView) itemView.findViewById(R.id.cardTitle);
+            image = (ImageView) itemView.findViewById(R.id.person_photo);
+            timeStart = (TextView) itemView.findViewById(R.id.cardTimeStart);
+            priority = (TextView) itemView.findViewById(R.id.cardPriority);
+            image.setImageResource(R.drawable.ic_action_pin);
 
         }
     }

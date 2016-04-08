@@ -17,9 +17,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.FindCallback;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+
+import java.util.List;
 
 import mobcom.iacademy.thesis.controller.MainActivity;
 import mobcom.iacademy.thesis.R;
@@ -124,6 +129,7 @@ public class LoginActivity extends AppCompatActivity {
                 public void done(ParseUser parseUser, ParseException e) {
                     if(e == null){
                         progressDialog.cancel();
+
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
                     }else{
                         progressDialog.cancel();
@@ -150,5 +156,7 @@ public class LoginActivity extends AppCompatActivity {
         a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(a);
     }
+
+
 }
 

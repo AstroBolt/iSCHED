@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ListFragment;
 import android.support.v4.view.MenuItemCompat;
@@ -35,7 +34,6 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,16 +65,8 @@ public class RoutineList extends ListFragment {
         emptyView = (TextView) view.findViewById(R.id.empty);
         emptyView.setVisibility(View.GONE);
 
-        //set delay
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // Do something after 1s = 1000ms
-                progressBar.setVisibility(View.VISIBLE);
-                populateListView();
-            }
-        }, 1500);
+
+        populateListView();
 
 
         FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
@@ -128,6 +118,7 @@ public class RoutineList extends ListFragment {
 
     private void populateListView() {
         routine = new ArrayList<>();
+        routine.clear();
         mAdapter = new ArrayAdapter<>(getActivity(), R.layout.listview_row, routine);
         setListAdapter(mAdapter);
         ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -164,7 +155,7 @@ public class RoutineList extends ListFragment {
             });
 
 
-        }else{
+        } else {
             progressBar.setVisibility(View.GONE);
             // If there is no connection, let the user know the sync didn't happen
             Toast.makeText(
@@ -199,9 +190,9 @@ public class RoutineList extends ListFragment {
                         }
                         ((ArrayAdapter<RoutineBean>) getListAdapter()).notifyDataSetChanged();
 
-                        if(list.size() == 0){
+                        if (list.size() == 0) {
                             emptyView.setVisibility(View.VISIBLE);
-                        }else{
+                        } else {
                             emptyView.setVisibility(View.GONE);
                         }
                     } else {
@@ -209,7 +200,7 @@ public class RoutineList extends ListFragment {
                     }
                 }
             });
-        }else{
+        } else {
             progressBar.setVisibility(View.GONE);
             // If there is no connection, let the user know the sync didn't happen
             Toast.makeText(
@@ -247,9 +238,9 @@ public class RoutineList extends ListFragment {
                         }
                         ((ArrayAdapter<RoutineBean>) getListAdapter()).notifyDataSetChanged();
 
-                        if(list.size() == 0){
+                        if (list.size() == 0) {
                             emptyView.setVisibility(View.VISIBLE);
-                        }else{
+                        } else {
                             emptyView.setVisibility(View.GONE);
                         }
                     } else {
@@ -257,7 +248,7 @@ public class RoutineList extends ListFragment {
                     }
                 }
             });
-        }else{
+        } else {
             progressBar.setVisibility(View.GONE);
             emptyView.setVisibility(View.VISIBLE);
             // If there is no connection, let the user know the sync didn't happen
@@ -314,6 +305,7 @@ public class RoutineList extends ListFragment {
             routine.put("routineGroup", routineName.toUpperCase());
             routine.put("username", ParseUser.getCurrentUser().getObjectId());
             routine.put("isDeleted", false);
+            routine.pinInBackground();
             routine.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(ParseException e) {

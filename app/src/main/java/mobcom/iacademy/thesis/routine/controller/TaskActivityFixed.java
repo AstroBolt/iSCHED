@@ -29,6 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
@@ -52,7 +53,7 @@ public class TaskActivityFixed extends AppCompatActivity {
 
     Intent intent;
     ProgressDialog progressDialog;
-    RoutineBean routineBean;
+    TaskBean routineBean;
     Toolbar toolbar;
 
     @Override
@@ -62,11 +63,15 @@ public class TaskActivityFixed extends AppCompatActivity {
 
         intent = this.getIntent();
         if (intent != null) {
-            routineBean = new RoutineBean(intent.getStringExtra("groupId"), intent.getStringExtra("groupName"), intent.getStringExtra("groupAdmin"));
+            routineBean = new TaskBean(intent.getStringExtra("groupId"), intent.getStringExtra("groupName"), intent.getStringExtra("groupAdmin"));
         }
 
+        //Log.d("GroupID: ",routineBean.getRoutineId() );
+        Log.d("GroupName: ",routineBean.getRoutineGroup() );
+        Log.d("Owner: ", routineBean.getUsername());
+
         toolbar = (Toolbar) findViewById(R.id.tabanim_toolbar);
-        toolbar.setTitle(routineBean.getRoutineName());
+        toolbar.setTitle(routineBean.getRoutineGroup());
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -74,7 +79,7 @@ public class TaskActivityFixed extends AppCompatActivity {
         setupViewPager(viewPager);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabanim_tabs);
-        tab
+        tabLayout.setTabMode(TabLayout.MODE_FIXED);
         tabLayout.setupWithViewPager(viewPager);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -82,9 +87,9 @@ public class TaskActivityFixed extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(TaskActivityFixed.this, NewTaskActivity.class);
-                intent.putExtra("groupId", routineBean.getId());
-                intent.putExtra("groupName", routineBean.getRoutineName());
-                intent.putExtra("groupAdmin", routineBean.getRoutineAdmin());
+                intent.putExtra("groupId", routineBean.getRoutineId());
+                intent.putExtra("groupName", routineBean.getRoutineGroup());
+                intent.putExtra("groupAdmin", routineBean.getUsername());
 
                 startActivity(intent);
             }
@@ -178,7 +183,7 @@ public class TaskActivityFixed extends AppCompatActivity {
         alBuilder.setView(promptsView);
 
         final EditText userInput = (EditText) promptsView.findViewById(R.id.editTextDialogUserInput);
-        userInput.setText(routineBean.getRoutineName());
+        userInput.setText(routineBean.getRoutineGroup());
 
         alBuilder.setCancelable(false).setPositiveButton(R.string.dialogOk, new DialogInterface.OnClickListener() {
                     @Override
@@ -196,8 +201,8 @@ public class TaskActivityFixed extends AppCompatActivity {
                                 //if internet is connected
                                 ParseQuery<ParseObject> query = ParseQuery.getQuery("RoutineGroup");
                                 query.whereEqualTo("isDeleted", false);
-                                query.whereEqualTo("username", routineBean.getRoutineAdmin());
-                                query.getInBackground(routineBean.getId(), new GetCallback<ParseObject>() {
+                                query.whereEqualTo("username", routineBean.getUsername());
+                                query.getInBackground(routineBean.getRoutineId(), new GetCallback<ParseObject>() {
                                     @Override
                                     public void done(ParseObject parseObject, ParseException e) {
                                         parseObject.pinInBackground();
@@ -207,7 +212,7 @@ public class TaskActivityFixed extends AppCompatActivity {
                                             public void done(ParseException e) {
                                                 progressDialog.cancel();
                                                 routineBean.setRoutineName(userPrompt);
-                                                toolbar.setTitle(routineBean.getRoutineName());
+                                                toolbar.setTitle(userPrompt);
                                             }
                                         });
                                     }
@@ -243,10 +248,10 @@ public class TaskActivityFixed extends AppCompatActivity {
                 progressDialog.setCancelable(false);
                 progressDialog.show();
                 ParseQuery<ParseObject> query = ParseQuery.getQuery("RoutineGroup");
-                query.whereEqualTo("routineGroup", routineBean.getRoutineName());
+                query.whereEqualTo("routineGroup", routineBean.getRoutineGroup());
                 query.whereEqualTo("username", ParseUser.getCurrentUser().getUsername());
                 query.whereEqualTo("isDeleted", false);
-                query.getInBackground(routineBean.getId(), new GetCallback<ParseObject>() {
+                query.getInBackground(routineBean.getRoutineId(), new GetCallback<ParseObject>() {
                     @Override
                     public void done(ParseObject parseObject, ParseException e) {
                         if (e == null) {
@@ -274,8 +279,9 @@ public class TaskActivityFixed extends AppCompatActivity {
     public static class DummyFragment extends Fragment {
         int color;
         int day;
+        ProgressBar progressBar;
         Intent intent;
-        private RoutineBean routine;
+        private TaskBean routine;
         SimpleRecyclerAdapter adapter;
 
         public DummyFragment() {
@@ -290,6 +296,7 @@ public class TaskActivityFixed extends AppCompatActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View view = inflater.inflate(R.layout.dummy_fragment, container, false);
+            progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
             final FrameLayout frameLayout = (FrameLayout) view.findViewById(R.id.dummyfrag_bg);
             frameLayout.setBackgroundColor(color);
             RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.dummyfrag_scrollableview);
@@ -297,11 +304,12 @@ public class TaskActivityFixed extends AppCompatActivity {
             recyclerView.setLayoutManager(linearLayoutManager);
             recyclerView.setHasFixedSize(true);
 
+            Log.d("Current Day: ", String.valueOf(day));
             intent = getActivity().getIntent();
             if (intent != null) {
-                routine = new RoutineBean(intent.getStringExtra("groupId"), intent.getStringExtra("groupName"), intent.getStringExtra("groupAdmin"));
+                routine = new TaskBean(intent.getStringExtra("groupId"), intent.getStringExtra("groupName"), intent.getStringExtra("groupAdmin"));
             }
-
+            progressBar.setVisibility(View.VISIBLE);
             //Sunday
             final List<TaskBean> posts = new ArrayList<>();
             adapter = new SimpleRecyclerAdapter(posts, getActivity());
@@ -309,7 +317,7 @@ public class TaskActivityFixed extends AppCompatActivity {
             ParseQuery<ParseObject> query = ParseQuery.getQuery("Routine");
             query.fromLocalDatastore();
             query.orderByAscending("createdAt");
-            query.whereEqualTo("routineGroup", routine.getId());
+            query.whereEqualTo("routineGroup", routine.getRoutineId());
             query.whereEqualTo("username", ParseUser.getCurrentUser().getUsername());
             query.whereEqualTo("SelectedDay", day);
             query.whereEqualTo("isCompleted", false);
@@ -317,9 +325,9 @@ public class TaskActivityFixed extends AppCompatActivity {
                 @Override
                 public void done(List<ParseObject> list, ParseException e) {
                     if (e == null) {
-
+                        progressBar.setVisibility(View.GONE);
                         for (ParseObject post : list) {
-                            TaskBean task = new TaskBean(post.getObjectId(), post.getString("Title"), post.getString("Content"), post.getString("DueDate"), post.getString("Priority"), post.getString("username"), post.getString("routineGroup"), post.getString("routineName") ,post.getString("timeStart"));
+                            TaskBean task = new TaskBean(post.getObjectId(), post.getString("Title"), post.getString("Content"), post.getString("DueDate"), post.getString("Priority"), post.getString("username"),post.getString("timeStart"), post.getString("routineGroup"), post.getString("routineName"));
                             posts.add(task);
                         }
                         adapter.notifyDataSetChanged();

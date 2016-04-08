@@ -204,31 +204,27 @@ public class Group extends ListFragment {
             progressDialog.setMessage(getString(R.string.new_group_loading));
             progressDialog.show();
             final ParseObject newGroup = new ParseObject("Group");
+            newGroup.put("user", ParseObject.createWithoutData("Group", ParseUser.getCurrentUser().getObjectId()));
             newGroup.put("admin", ParseUser.getCurrentUser().getObjectId());
             newGroup.put("username", ParseUser.getCurrentUser().getUsername());
             newGroup.put("groupName", groupName.toUpperCase());
             newGroup.put("isDeleted", false);
-            newGroup.saveInBackground(new SaveCallback() {
+            newGroup.saveEventually(new SaveCallback() {
                 @Override
                 public void done(ParseException e) {
-                    if (e == null) {
-                        ParseObject groups = new ParseObject("GroupMembers");
-                        groups.put("groupId", newGroup.getObjectId());
-                        groups.put("username", ParseUser.getCurrentUser().getUsername());
-                        groups.put("userId", ParseUser.getCurrentUser().getObjectId());
-                        groups.put("usergroup", groupName.toUpperCase());
-                        groups.put("isDeleted", false);
-                        groups.put("isAdmin", true);
-                        groups.put("notified", false);
-                        groups.saveInBackground(new SaveCallback() {
-                            @Override
-                            public void done(ParseException e) {
-                                populateListView();
-                                emptyView.setVisibility(View.GONE);
-                                progressDialog.cancel();
-                            }
-                        });
-                    }
+                    ParseObject groups = new ParseObject("GroupMembers");
+                    groups.put("groupId", newGroup.getObjectId());
+                    groups.put("username", ParseUser.getCurrentUser().getUsername());
+                    groups.put("userId", ParseUser.getCurrentUser().getObjectId());
+                    groups.put("usergroup", groupName.toUpperCase());
+                    groups.put("isDeleted", false);
+                    groups.put("isAdmin", true);
+                    groups.put("notified", false);
+                    groups.saveEventually();
+                    progressDialog.cancel();
+                    populateListView();
+                    emptyView.setVisibility(View.GONE);
+                    Toast.makeText(getActivity().getApplicationContext(), "Group Successfully Created", Toast.LENGTH_SHORT).show();
                 }
             });
         } else {

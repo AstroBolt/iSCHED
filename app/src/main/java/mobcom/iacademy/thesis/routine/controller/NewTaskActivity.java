@@ -1,6 +1,6 @@
 package mobcom.iacademy.thesis.routine.controller;
 
-import android.app.AlertDialog;
+
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,9 +8,11 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,14 +36,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import mobcom.iacademy.thesis.R;
-import mobcom.iacademy.thesis.routine.model.RoutineBean;
+import mobcom.iacademy.thesis.routine.model.TaskBean;
 
 public class NewTaskActivity extends AppCompatActivity implements
         com.wdullaer.materialdatetimepicker.date.DatePickerDialog.OnDateSetListener,
         com.wdullaer.materialdatetimepicker.time.TimePickerDialog.OnTimeSetListener {
 
     private ArrayList<Integer> selectedDayIndexList;
-    private RoutineBean routineBean;
+    private TaskBean routineBean;
     private Intent intent;
     private Button dueDate, priority, day, timeStart;
     private TextView dueDateTv, priorityTv, dayTv, timeStartTv;
@@ -77,7 +79,7 @@ public class NewTaskActivity extends AppCompatActivity implements
 
         intent = this.getIntent();
         if (intent != null) {
-            routineBean = new RoutineBean(intent.getStringExtra("groupId"), intent.getStringExtra("groupName"), intent.getStringExtra("groupAdmin"));
+            routineBean = new TaskBean(intent.getStringExtra("groupId"), intent.getStringExtra("groupName"), intent.getStringExtra("groupAdmin"));
         }
     }
 
@@ -175,34 +177,34 @@ public class NewTaskActivity extends AppCompatActivity implements
         NetworkInfo ni = cm.getActiveNetworkInfo();
         if ((ni != null) && (ni.isConnected())) {
             ParseObject routines = new ParseObject("Routine");
-            routines.put("username", ParseUser.getCurrentUser());
+            routines.put("username", ParseUser.getCurrentUser().getUsername());
             routines.put("timeStart", timeStartFormat);
-            routines.put("routineGroup", routineBean.getId());
-            routines.put("routineName", routineBean.getRoutineName());
+            routines.put("routineGroup", routineBean.getRoutineId());
+            routines.put("routineName", routineBean.getRoutineGroup());
             routines.put("Title", taskTitle.getText().toString());
             routines.put("Content", taskContent.getText().toString());
             routines.put("DueDate", dateNow);
             routines.put("Priority", selectedPriority);
             routines.put("isCompleted", false);
-            routines.put("SelectedDay", selectedDayIndexList);
+            routines.addAllUnique("SelectedDay", selectedDayIndexList);
             routines.pinInBackground();
             routines.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(ParseException e) {
-                    if(e == null){
-                        progressDialog.dismiss();
-                        intent = new Intent(NewTaskActivity.this, TaskActivityFixed.class);
-                        intent.putExtra("groupId", routineBean.getId());
-                        intent.putExtra("groupName", routineBean.getRoutineName());
-                        intent.putExtra("groupAdmin", routineBean.getRoutineAdmin());
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                    }else{
-                        progressDialog.dismiss();
-                        Log.d("Parse Error", e.getMessage());
-                    }
+                    progressDialog.dismiss();
+                    intent = new Intent(NewTaskActivity.this, TaskActivityFixed.class);
+                    intent.putExtra("groupId", routineBean.getRoutineId());
+                    intent.putExtra("groupName", routineBean.getRoutineGroup());
+                    intent.putExtra("groupAdmin", ParseUser.getCurrentUser().getUsername());
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
                 }
             });
+
+
+
+
+
         }else {
             progressDialog.cancel();
             // If there is no connection, let the user know the sync didn't happen
@@ -256,12 +258,17 @@ public class NewTaskActivity extends AppCompatActivity implements
         selectedDayIndexList = new ArrayList<>();
         selectedDayIndexList.clear();
         final CharSequence myDays[] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+        boolean[] isSelectedArray = {false, false, false, false, false, false, false};
         AlertDialog.Builder builder = new AlertDialog.Builder(NewTaskActivity.this);
-        builder.setTitle(R.string.selectDay).setSingleChoiceItems(myDays, -1, new DialogInterface.OnClickListener() {
+
+        builder.setTitle(R.string.selectDay).setMultiChoiceItems(myDays, isSelectedArray, new DialogInterface.OnMultiChoiceClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                selectedDay = myDays[which].toString();
-                selectedDayIndexList.add(which);
+            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                if(isChecked){
+                    selectedDayIndexList.add(which);
+                }else if(selectedDayIndexList.contains(which)){
+                    selectedDayIndexList.remove(Integer.valueOf(which));
+                }
             }
         }).setPositiveButton(R.string.dialogOk, new DialogInterface.OnClickListener() {
             @Override
@@ -365,9 +372,9 @@ public class NewTaskActivity extends AppCompatActivity implements
 
             case R.id.action_cancel:
                 intent = new Intent(NewTaskActivity.this, TaskActivityFixed.class);
-                intent.putExtra("groupId", routineBean.getId());
-                intent.putExtra("groupName", routineBean.getRoutineName());
-                intent.putExtra("groupAdmin", routineBean.getRoutineAdmin());
+                intent.putExtra("groupId", routineBean.getRoutineId());
+                intent.putExtra("groupName", routineBean.getRoutineGroup());
+                intent.putExtra("groupAdmin", routineBean.getUsername());
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 break;

@@ -44,7 +44,7 @@ public class EditTaskActivity extends AppCompatActivity implements
         com.wdullaer.materialdatetimepicker.time.TimePickerDialog.OnTimeSetListener {
 
     private ArrayList<Integer> selectedDayIndexList = new ArrayList<>();
-    private RoutineBean routineBean;
+    private TaskBean routineBean;
     private Intent intent;
     private Button dueDate, priority, day, timeStart;
     private TextView dueDateTv, priorityTv, dayTv, timeStartTv;
@@ -90,9 +90,9 @@ public class EditTaskActivity extends AppCompatActivity implements
 
             case android.R.id.home:
                 intent = new Intent(EditTaskActivity.this, TaskActivityFixed.class);
-                intent.putExtra("groupId", routineBean.getId());
-                intent.putExtra("groupName", routineBean.getRoutineName());
-                intent.putExtra("groupAdmin", routineBean.getRoutineAdmin());
+                intent.putExtra("groupId", routineBean.getRoutineId());
+                intent.putExtra("groupName", routineBean.getRoutineGroup());
+                intent.putExtra("groupAdmin", ParseUser.getCurrentUser().getUsername());
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 Toast.makeText(EditTaskActivity.this, "No information entered. Task not saved", Toast.LENGTH_SHORT).show();
                 startActivity(intent);
@@ -118,7 +118,7 @@ public class EditTaskActivity extends AppCompatActivity implements
 
         intent = this.getIntent();
         if (intent != null) {
-            routineBean = new RoutineBean(intent.getStringExtra("groupId"),
+            routineBean = new TaskBean(intent.getStringExtra("groupId"),
                     intent.getStringExtra("groupName"),
                     intent.getStringExtra("groupAdmin"));
 
@@ -129,16 +129,17 @@ public class EditTaskActivity extends AppCompatActivity implements
                     intent.getStringExtra("noteContent"),
                     intent.getStringExtra("noteDate"),
                     intent.getStringExtra("notePriority"),
-                    intent.getStringExtra("groupId"),
-                    intent.getStringExtra("routineName"),
                     intent.getStringExtra(ParseUser.getCurrentUser().getUsername()),
-                    intent.getStringExtra("timeStart"));
+                    intent.getStringExtra("timeStart"),
+                    intent.getStringExtra("groupId"),
+                    intent.getStringExtra("groupName"));
 
 
             currentDay = intent.getStringExtra("selectedDay");
 
         }
 
+        Toast.makeText(EditTaskActivity.this, routineBean.getRoutineId(), Toast.LENGTH_SHORT).show();
 
         dateNow = note.getDueDate();
         selectedPriority = note.getPriority();
@@ -256,7 +257,7 @@ public class EditTaskActivity extends AppCompatActivity implements
                             progressDialog.setCancelable(false);
                             progressDialog.show();
                             ParseQuery<ParseObject> query = ParseQuery.getQuery("Routine");
-                            query.whereEqualTo("routineGroup", routineBean.getRoutineName());
+                            query.whereEqualTo("routineGroup", routineBean.getRoutineId());
                             query.whereEqualTo("username", ParseUser.getCurrentUser().getUsername());
                             query.whereEqualTo("isCompleted", false);
                             query.getInBackground(note.getId(), new GetCallback<ParseObject>() {
@@ -269,9 +270,9 @@ public class EditTaskActivity extends AppCompatActivity implements
                                         public void done(ParseException e) {
                                             progressDialog.cancel();
                                             intent = new Intent(EditTaskActivity.this, TaskActivityFixed.class);
-                                            intent.putExtra("groupId", note.getRoutineGroup());
-                                            intent.putExtra("groupName", note.getRoutineName());
-                                            intent.putExtra("groupAdmin", note.getUsername());
+                                            intent.putExtra("groupId", note.getRoutineId());
+                                            intent.putExtra("groupName", note.getRoutineGroup());
+                                            intent.putExtra("groupAdmin", ParseUser.getCurrentUser().getUsername());
                                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                                             startActivity(intent);
                                         }
@@ -300,7 +301,7 @@ public class EditTaskActivity extends AppCompatActivity implements
         NetworkInfo ni = cm.getActiveNetworkInfo();
         if ((ni != null) && (ni.isConnected())) {
             ParseQuery<ParseObject> query = ParseQuery.getQuery("Routine");
-            query.whereEqualTo("routineGroup", routineBean.getRoutineName());
+            query.whereEqualTo("routineGroup", routineBean.getRoutineId());
             query.whereEqualTo("username", ParseUser.getCurrentUser().getUsername());
             query.whereEqualTo("isCompleted", false);
             query.getInBackground(note.getId(), new GetCallback<ParseObject>() {
@@ -308,7 +309,6 @@ public class EditTaskActivity extends AppCompatActivity implements
                 public void done(ParseObject parseObject, ParseException e) {
                     parseObject.put("username", ParseUser.getCurrentUser().getUsername());
                     parseObject.put("timeStart", timeStartFormat);
-                    parseObject.put("routineGroup", routineBean.getId());
                     parseObject.put("Title", taskTitle.getText().toString());
                     parseObject.put("Content", taskContent.getText().toString());
                     parseObject.put("DueDate", dateNow);
@@ -322,9 +322,9 @@ public class EditTaskActivity extends AppCompatActivity implements
                             if (e == null) {
                                 progressDialog.cancel();
                                 intent = new Intent(EditTaskActivity.this, TaskActivityFixed.class);
-                                intent.putExtra("groupId", note.getRoutineGroup());
-                                intent.putExtra("groupName", note.getRoutineName());
-                                intent.putExtra("groupAdmin", note.getUsername());
+                                intent.putExtra("groupId", note.getRoutineId());
+                                intent.putExtra("groupName", note.getRoutineGroup());
+                                intent.putExtra("groupAdmin",ParseUser.getCurrentUser().getUsername());
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
                             } else {
